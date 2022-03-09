@@ -1,0 +1,50 @@
+{
+    "arch": "x86_64",
+    "build": "h033912b_0",
+    "build_number": 0,
+    "build_string": "h033912b_0",
+    "channel": "https://conda.anaconda.org/conda-forge/osx-64",
+    "constrains": [],
+    "depends": [],
+    "extracted_package_dir": "/Users/verzani/.julia/scratchspaces/0b3b1443-0f03-428d-bdfb-f27f9c1191ea/root/pkgs/ca-certificates-2021.10.8-h033912b_0",
+    "files": [
+        "ssl/cacert.pem",
+        "ssl/cert.pem"
+    ],
+    "fn": "ca-certificates-2021.10.8-h033912b_0.tar.bz2",
+    "license": "ISC",
+    "link": {
+        "source": "/Users/verzani/.julia/scratchspaces/0b3b1443-0f03-428d-bdfb-f27f9c1191ea/root/pkgs/ca-certificates-2021.10.8-h033912b_0",
+        "type": 1
+    },
+    "md5": "bb82d0243db9882b509702ecb69e38f0",
+    "name": "ca-certificates",
+    "package_tarball_full_path": "/Users/verzani/.julia/scratchspaces/0b3b1443-0f03-428d-bdfb-f27f9c1191ea/root/pkgs/ca-certificates-2021.10.8-h033912b_0.tar.bz2",
+    "paths_data": {
+        "paths": [
+            {
+                "_path": "ssl/cacert.pem",
+                "path_type": "hardlink",
+                "sha256": "fa883829ebb8cd2a602f9b21c1f85de24cf47949d520bceb1828b4cd1cb6906c",
+                "sha256_in_prefix": "fa883829ebb8cd2a602f9b21c1f85de24cf47949d520bceb1828b4cd1cb6906c",
+                "size_in_bytes": 265969
+            },
+            {
+                "_path": "ssl/cert.pem",
+                "path_type": "softlink",
+                "sha256_in_prefix": "fa883829ebb8cd2a602f9b21c1f85de24cf47949d520bceb1828b4cd1cb6906c",
+                "size_in_bytes": 265969
+            }
+        ],
+        "paths_version": 1
+    },
+    "platform": "osx",
+    "requested_spec": "",
+    "sha256": "ff652243cd03ec6ef3b3d6ea058f9ebfe38dbef8ade82b1ee47009e5e8f4ae62",
+    "size": 142316,
+    "subdir": "osx-64",
+    "timestamp": 1633733356799,
+    "track_features": "",
+    "url": "https://conda.anaconda.org/conda-forge/osx-64/ca-certificates-2021.10.8-h033912b_0.tar.bz2",
+    "version": "2021.10.8"
+}

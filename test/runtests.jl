@@ -1,6 +1,13 @@
 using SymPyCall
 using Test
 
-@testset "SymPyCall.jl" begin
-    # Write your tests here.
-end
+include("tests.jl")
+include("test-math.jl")
+include("test-matrix.jl")
+include("test-ode.jl")
+include("test-logical.jl")
+include("test-specialfuncs.jl")
+#include("test-permutations.jl")
+#include("test-physics.jl")
+#include("test-external-module.jl")
+include("test-latexify.jl")

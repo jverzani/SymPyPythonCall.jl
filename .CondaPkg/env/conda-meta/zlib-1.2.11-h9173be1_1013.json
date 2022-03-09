@@ -1,0 +1,77 @@
+{
+    "arch": "x86_64",
+    "build": "h9173be1_1013",
+    "build_number": 1013,
+    "build_string": "h9173be1_1013",
+    "channel": "https://conda.anaconda.org/conda-forge/osx-64",
+    "constrains": [],
+    "depends": [
+        "libzlib 1.2.11 h9173be1_1013"
+    ],
+    "extracted_package_dir": "/Users/verzani/.julia/scratchspaces/0b3b1443-0f03-428d-bdfb-f27f9c1191ea/root/pkgs/zlib-1.2.11-h9173be1_1013",
+    "files": [
+        "include/zconf.h",
+        "include/zlib.h",
+        "lib/libz.a",
+        "lib/libz.dylib",
+        "lib/pkgconfig/zlib.pc"
+    ],
+    "fn": "zlib-1.2.11-h9173be1_1013.tar.bz2",
+    "license": "Zlib",
+    "license_family": "Other",
+    "link": {
+        "source": "/Users/verzani/.julia/scratchspaces/0b3b1443-0f03-428d-bdfb-f27f9c1191ea/root/pkgs/zlib-1.2.11-h9173be1_1013",
+        "type": 1
+    },
+    "md5": "cf985617d679990418c380099620b01a",
+    "name": "zlib",
+    "package_tarball_full_path": "/Users/verzani/.julia/scratchspaces/0b3b1443-0f03-428d-bdfb-f27f9c1191ea/root/pkgs/zlib-1.2.11-h9173be1_1013.tar.bz2",
+    "paths_data": {
+        "paths": [
+            {
+                "_path": "include/zconf.h",
+                "path_type": "hardlink",
+                "sha256": "77304005ceb5f0d03ad4c37eb8386a10866e4ceeb204f7c3b6599834c7319541",
+                "sha256_in_prefix": "77304005ceb5f0d03ad4c37eb8386a10866e4ceeb204f7c3b6599834c7319541",
+                "size_in_bytes": 16262
+            },
+            {
+                "_path": "include/zlib.h",
+                "path_type": "hardlink",
+                "sha256": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8",
+                "sha256_in_prefix": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8",
+                "size_in_bytes": 96239
+            },
+            {
+                "_path": "lib/libz.a",
+                "path_type": "hardlink",
+                "sha256": "3de1b9c510df7d7fb88449f7a12876534caa81368ef13d67117a1857052d641b",
+                "sha256_in_prefix": "3de1b9c510df7d7fb88449f7a12876534caa81368ef13d67117a1857052d641b",
+                "size_in_bytes": 116416
+            },
+            {
+                "_path": "lib/libz.dylib",
+                "path_type": "softlink",
+                "sha256_in_prefix": "089c1634b4c7fbcc568a2003eae1aedf90418388de9162d07655a38e253d8c8c",
+                "size_in_bytes": 100908
+            },
+            {
+                "_path": "lib/pkgconfig/zlib.pc",
+                "path_type": "hardlink",
+                "sha256": "e225b209f0c0c3cf76790e901a94e00414de36c73da0f674313dedcb9678e722",
+                "sha256_in_prefix": "ad1bdd1c95306ddf7547fab3dbf4595b26573d374e9bebb80c0c6781ff8e32f1",
+                "size_in_bytes": 504
+            }
+        ],
+        "paths_version": 1
+    },
+    "platform": "osx",
+    "requested_spec": "",
+    "sha256": "9102c5f89c78c56b0bb0766a074f509d67362cf97aa66d706d4e95e9061bb03c",
+    "size": 88814,
+    "subdir": "osx-64",
+    "timestamp": 1633226920610,
+    "track_features": "",
+    "url": "https://conda.anaconda.org/conda-forge/osx-64/zlib-1.2.11-h9173be1_1013.tar.bz2",
+    "version": "1.2.11"
+}
