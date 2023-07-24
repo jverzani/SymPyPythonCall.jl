@@ -44,11 +44,11 @@ unSym(x::Irrational{:π}) = unSym(sympy.pi)
 unSymkwargs(kw) = (k=>unSym(v) for (k,v) ∈ kw)
 ↓(args...; kwargs...) = unSym(args...; kwargs...)
 
-#PythonCall.getpy(x::Sym) = ↓(x)
-PythonCall.getpy(x::NTuple{N,T}) where {N, T <: SymbolicObject} = ↓(x)
-PythonCall.getpy(x::Vector{T}) where {T <: SymbolicObject} = unSym.(x)
-PythonCall.getpy(x::Matrix{T}) where {T <: SymbolicObject} = unSym.(x)
-PythonCall.getpy(x::Set{T}) where {T <: SymbolicObject} = unSym(x)
+#PythonCall.Py(x::Sym) = ↓(x)
+PythonCall.Py(x::NTuple{N,T}) where {N, T <: SymbolicObject} = ↓(x)
+PythonCall.Py(x::Vector{T}) where {T <: SymbolicObject} = unSym.(x)
+PythonCall.Py(x::Matrix{T}) where {T <: SymbolicObject} = unSym.(x)
+PythonCall.Py(x::Set{T}) where {T <: SymbolicObject} = unSym(x)
 
 
 
@@ -144,7 +144,7 @@ generic_methods = (
 for (pmod, pmeth, jmod, jmeth) ∈ generic_methods
     @eval begin
         ($(jmod).$(jmeth))(x::Sym, args...; kwargs...) =
-            ↑(getpy($(pmod)).$(pmeth)(↓(x), ↓(args)...; unSymkwargs(kwargs)...))
+            ↑(Py($(pmod)).$(pmeth)(↓(x), ↓(args)...; unSymkwargs(kwargs)...))
     end
 end
 
@@ -178,7 +178,7 @@ new_exported_methods = (
 for (pmod, pmeth, jmeth) ∈ new_exported_methods
     @eval begin
         ($(jmeth))(x::Sym, args...; kwargs...) =
-            ↑(getpy($(pmod)).$(pmeth)(↓(x), ↓(args)...; unSymkwargs(kwargs)...))
+            ↑(Py($(pmod)).$(pmeth)(↓(x), ↓(args)...; unSymkwargs(kwargs)...))
         export $(jmeth)
     end
 end
@@ -192,6 +192,6 @@ object_methods = (
 for (ometh, jmod, jmeth) ∈ object_methods
     @eval begin
         ($(jmod).$(jmeth))(x::Sym, args...; kwargs...) =
-            ↑(getpy(x).$(ometh)(↓(args)...; unSymkwargs(kwargs)...))
+            ↑(Py(x).$(ometh)(↓(args)...; unSymkwargs(kwargs)...))
     end
 end

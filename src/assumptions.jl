@@ -39,9 +39,9 @@ julia> ## really slow isprime:
 """
 function ask(x::Sym, args...)
     val = sympy.ask(x, args...)
-    Bool(getpy(val) == pybuiltins.None) && return nothing
-    Bool(getpy(val) == pybuiltins.True) && return true
-    Bool(getpy(val) == pybuiltins.False) && return false
+    Bool(Py(val) == pybuiltins.None) && return nothing
+    Bool(Py(val) == pybuiltins.True) && return true
+    Bool(Py(val) == pybuiltins.False) && return false
     throw(DomainError("Argument not none, true, or false"))
 end
 

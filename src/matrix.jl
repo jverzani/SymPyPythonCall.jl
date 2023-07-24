@@ -38,19 +38,21 @@ for (smeth, jmod, jmeth) ∈ matrix_meths
 end
 
 
-function Base.getproperty(M::Matrix{Sym}, prop::Symbol)
-    val = pygetattr(↓(M), string(prop))
+function Base.getproperty(M::AbstractArray{<:Sym}, prop::Symbol)
+    MM = sympy.Matrix.val(↓(M))
+    val = pygetattr(MM, string(prop))
+    #val = pygetattr(↓(M), string(prop))
     meth = pygetattr(val, "__call__", nothing)
     meth == nothing && return Sym(val)
     return SymbolicCallable(meth)
 end
 
-function Base.getproperty(X::Vector{Sym}, prop::Symbol)
-    val = pygetattr(sympy.Matrix(Tuple(xᵢ for xᵢ ∈ X)), string(prop))
-    meth = pygetattr(val, "__call__", nothing)
-    meth == nothing && return Sym(val)
-    return SymbolicCallable(meth)
-end
+# function Base.getproperty(X::Vector{Sym}, prop::Symbol)
+#     val = pygetattr(sympy.Matrix.val(Tuple(xᵢ for xᵢ ∈ X)), string(prop))
+#     meth = pygetattr(val, "__call__", nothing)
+#     meth == nothing && return Sym(val)
+#     return SymbolicCallable(meth)
+# end
 
 # solve Ax=b for x, avoiding generic `lu`, which can be very slow for bigger n values
 # fix suggested by @olof3 in issue 355
