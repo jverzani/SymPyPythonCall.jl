@@ -10,7 +10,7 @@ using Test
     @syms x a F()
     ex = diff(F(x), x) - a*F(x)
     ex1 = dsolve(ex)
-    ex2 = ex1.rhs()(Sym("C1") => 1, a => 2)
+    ex2 = ex1.rhs(Sym("C1") => 1, a => 2)
     @test ex2 == exp(2x)
 
     #t = @syms t

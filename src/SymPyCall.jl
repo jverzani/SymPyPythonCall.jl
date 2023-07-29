@@ -47,7 +47,6 @@ export sympy,
     Differential
 
 
-
 # define sympy in int
 const __sympy__ = PythonCall.pynew()
 const sympy = Sym(__sympy__)

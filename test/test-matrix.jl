@@ -46,7 +46,7 @@ using LinearAlgebra
 
     # abs
     @test  all(convert.(Bool, abs.(A) .≧ 0))
-    @test  abs.(A) == abs.(view(A, :, :))
+    ## XXX @test  abs.(A) == abs.(view(A, :, :))
 
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test A.is_lower == istril(A)

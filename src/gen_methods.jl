@@ -28,7 +28,7 @@ function asSymbolic(x::Py)
     Sym(x)
 end
 asSymbolic(x::String) = x
-asSymbolic(x) = (@show x; Sym(pyconvert(Py, x)))
+asSymbolic(x) = Sym(pyconvert(Py, x))
 ↑(args...; kwargs...) = asSymbolic(args...; kwargs...)
 
 
@@ -37,7 +37,7 @@ unSym(x) = x
 unSym(x::Sym) = getfield(x, :py)
 unSym(x::Tuple) = unSym.(x)
 unSym(x::Vector) = Tuple(unSym.(x)) # <-- is this an issue?
-unSym(x::Matrix) = sympy.py.Matrix(Tuple(↓(mᵢ for mᵢ ∈ eachrow(x)))) # mutable dense matrix
+unSym(x::Matrix) = sympy.py.Matrix(Tuple(↓(mᵢ) for mᵢ ∈ eachrow(x))) # mutable dense matrix
 unSym(x::Dict) = convert(PyDict,Dict(unSym(k) => unSym(v) for (k,v) ∈ x)) # AbstractDict?
 unSym(x::Set) = sympy.py.Set(SymPyCall.unSym(collect(x)))
 unSym(x::Irrational{:π}) = unSym(sympy.pi)
