@@ -6,7 +6,7 @@
 [![Coverage](https://codecov.io/gh/jverzani/SymPyCall.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/jverzani/SymPyCall.jl)
 
 
-This is a sketch of what is needed to use `PythonCall` instead of `PyCall` for `SymPy.jl`.
+This is a start on what is needed to use `PythonCall` instead of `PyCall` for `SymPy.jl`.
 At the moment, the expectation is that *if* that change proves desirable, this would become `SymPy`.
 
 For now, there are some small design decisions from `SymPy` reflected here:
