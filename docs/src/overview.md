@@ -2,7 +2,7 @@
 
 An interface between `Julia` and SymPy requires a few things. `PythonCall` can call into an underlying sympy library, for example
 
-```jldoctest pythoncall_overview
+```julia
 julia> import PythonCall
 
 julia> const _sympy_ = PythonCall.pynew()
@@ -13,7 +13,7 @@ julia> PythonCall.pycopy!(_sympy_, PythonCall.pyimport("sympy"));
 
 The `_sympy_` object holds references to the underlying sympy library. For example, we can create a symbolic variable and call the `sin` function on it as follows:
 
-```jldoctest pythoncall_overview
+```julia
 julia> x = _sympy_.symbols("x")
 Python: x
 
@@ -29,7 +29,7 @@ PythonCall.Py
 
 The `PythonCall` package provides some basic operations for `Py` objects, such as basic math operations:
 
-```jldoctest pythoncall_overview
+```julia
 julia> x + x
 Python: 2*x
 
@@ -83,7 +83,7 @@ We follow part of the `SymPy` docs to see how to access one of the numerous exte
 
 
 ```jldoctest overview
-julia> import PythonCall: pyimport
+julia> import SymPyCall.PythonCall: pyimport
 
 julia> stats = pyimport("sympy.stats");
 ```

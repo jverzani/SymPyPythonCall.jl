@@ -67,7 +67,7 @@ julia> f = log(sin(x)) + tan(sin(x^2)); string(f) # `string(f)` only so doctest 
 Types are specified through `func`:
 
 ```jldoctest replace
-julia> func = SymPy.Introspection.func
+julia> func = SymPyCall.Introspection.func
 func (generic function with 1 method)
 
 julia> replace(f, func(sin(x)), func(cos(x))) |> string  # type -> type

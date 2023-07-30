@@ -21,7 +21,7 @@ julia> using SymPyCall
 julia> @syms x::integer y::integer
 (x, y)
 
-julia> ask(𝑄.integer(x*y), And(𝑄.integer(x), 𝑄.integer(y)))
+julia> ask(𝑄.integer(x*y), SymPyCall.And(𝑄.integer(x), 𝑄.integer(y)))
 ERROR: UndefVarError: And not defined
 Stacktrace:
  [1] top-level scope
