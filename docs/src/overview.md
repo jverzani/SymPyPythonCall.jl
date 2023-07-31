@@ -58,7 +58,7 @@ sin(2*x)
 The package also provides methods for some sympy methods, such as `simplify` above. To make this work, there needs to be a means to take `Sym` objects to the `Py` counterparts and to take `Py` objects to `Sym`. As these conversions may be type dependent two operators (with the unicode equivalents `↓` and  `↑`) are used internally to allow the definition along these lines:
 
 ```
-simplify(x::Sym, args...; kwargs...) = ↑(Py(sympy).simplify(↓(x), ↓(args)...; ↓(kwargs)...))
+simplify(x::Sym, args...; kwargs...) = ↑(sympy.simplify(↓(x), ↓(args)...; ↓(kwargs)...))
 ```
 
 The `expand_log` function is not wrapped as such, but can be called from the `sympy` object exported by `SymPyCall`:
@@ -74,7 +74,7 @@ julia> sympy.expand_log(log(2x))
 log(x) + log(2)
 ```
 
-Methods of `sympy` are also defined using the conversion operators above.
+Methods of `sympy` are also called using the conversion operators above.
 
 ## Using other SymPy modules
 

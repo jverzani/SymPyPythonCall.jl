@@ -899,14 +899,16 @@ that approximates $\cos(x)$ near $0$:
 
 ```jldoctest introduction
 julia> a,b,c,h = symbols("a,b,c,h", real=true)
-(a, b, c, h)
+4-element Vector{Sym}:
+ a
+ b
+ c
+ h
 
 julia> p = a*x^2 + b*x + c
-   2
-a⋅x  + b⋅x + c
+a*x^2 + b*x + c
 
-julia> fn = cos
-cos (generic function with 14 methods)
+julia> fn = cos;
 
 julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 3-element Vector{Sym}:
@@ -995,12 +997,14 @@ Here is an alternative way of asking a previous question on a pair of linear equ
 
 ```jldoctest introduction
 julia> x, y = symbols("x,y", real=true)
-(x, y)
+2-element Vector{Sym}:
+ x
+ y
 
 julia> exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
 2-element Vector{Sym}:
-  2⋅x + 3⋅y = 6
- 3⋅x - 4⋅y = 12
+  Eq(2*x + 3*y, 6)
+ Eq(3*x - 4*y, 12)
 
 julia> d = solve(exs);
 
