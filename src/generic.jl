@@ -1,8 +1,7 @@
 # generic functions
-Base.hash(x::Sym, v::UInt64) = hash(getpy(x), v)
-Base.hash(x::Sym) = hash(getpy(x))
-Base.:(==)(x::Sym, y::Sym) = Bool(getpy(x) == getpy(y))
-
+Base.hash(x::Sym, v::UInt64) = hash(Py(x), v)
+Base.hash(x::Sym) = hash(Py(x))
+Base.:(==)(x::Sym, y::Sym) = Bool(Py(x) == Py(y))
 Base.isless(a::Sym, b::Sym) = (a != sympy.nan && b != sympy.nan) && sympy.Lt(a,b) == sympy.True
 Base.isless(a::Sym, b::Number) = isless(promote(a,b)...)
 Base.isless(a::Number, b::Sym) = isless(promote(a,b)...)

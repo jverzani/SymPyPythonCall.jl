@@ -51,7 +51,7 @@ function subs(ex::T, xs...; kwargs...) where {T <: SymbolicObject}
 end
 
 function subs(ex::T, d::Pair...; kwargs...)  where {T <: SymbolicObject}
-    isnothing(pygetattr(getpy(ex), "subs", nothing)) && return ex
+    isnothing(pygetattr(Py(ex), "subs", nothing)) && return ex
     ↑(ex.py.subs(↓([(first(p), last(p)) for p in d])))
 end
 
@@ -76,9 +76,9 @@ subs(d::Pair...; kwargs...)           = ex -> subs(ex, [(p.first, p.second) for 
 lhs(ex::SymbolicObject) = ↑(pygetattr(ex, "lhs", ↓(ex)))
 rhs(ex::SymbolicObject) = ↑(pygetattr(ex, "rhs", ↓(ex)))
 doit(ex::T; deep::Bool=false) where {T<:SymbolicObject} = ex.doit(deep=deep)
-doit(; deep::Bool=false)      where {T<:SymbolicObject} = ex -> doit(ex, deep=deep)
+doit(; deep::Bool=false)                                = ex -> doit(ex, deep=deep)
 
-rewrite(x::Sym, args...; kwargs...) = ↑(getpy(x).rewrite(↓(args)...; kwargs...))
+rewrite(x::Sym, args...; kwargs...) = ↑(Py(x).rewrite(↓(args)...; kwargs...))
 
 # extend to non-sym
 simplify(x, args...; kwargs...) = x
@@ -87,15 +87,15 @@ simplify(x, args...; kwargs...) = x
 function N(x::Sym)
     length(free_symbols(x)) > 0 && return x # really
 
-    u = getpy(x)
+    u = Py(x)
     if is_(:real, x) || is_(:Float, x)
         is_(:infinite, x) && return is_(:negative, x) ? -Inf : Inf
 
         if is_(:integer, x)
             return pyconvert(Integer, u)
 #            is_(:zero, x) && return 0
-#            T = Bool(getpy(abs(x)) < typemax(Int)) ? Int : BigInt
-#            return pyconvert(T, getpy(x))
+#            T = Bool(Py(abs(x)) < typemax(Int)) ? Int : BigInt
+#            return pyconvert(T, Py(x))
 
         elseif is_(:rational, x)
             return N(numerator(x)) // N(denominator(x))
@@ -127,10 +127,10 @@ function N(x::Sym)
 
 
     else
-        is_(:boolean, x) && return pyconvert(Bool, getpy(x))
+        is_(:boolean, x) && return pyconvert(Bool, Py(x))
         # ...
         # check for Python object int, float, complex, mpfm mpc ,...
-        u = getpy(x)
+        u = Py(x)
         pyisinstance(u, pybuiltins.int) &&
             return pyconvert(Bool(u.bit_length() > 64) ? BigInt : Int, u)
         if pyisinstance(u, pybuiltins.float)
@@ -157,15 +157,15 @@ N(x) = N(Sym(x))
 N(x::Sym, prec) = N(x.evalf(prec))
 
 function Base.Bool(x::Sym)
-    Bool(getpy(x) == pybuiltins.True) && return true
-    Bool(getpy(x) == pybuiltins.False) && return false
+    Bool(Py(x) == pybuiltins.True) && return true
+    Bool(Py(x) == pybuiltins.False) && return false
     throw(ArgumentError("x is not boolean"))
 end
 
 
 ##
 function free_symbols(x::Sym)
-    u = pygetattr(getpy(x), "free_symbols", nothing)
+    u = pygetattr(Py(x), "free_symbols", nothing)
     u == nothing && return Vector{Sym}[]
 
     fs = [Sym(uᵢ) for uᵢ ∈ PythonCall.pyconvert(PySet, u)]

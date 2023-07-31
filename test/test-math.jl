@@ -22,8 +22,8 @@ SymPy = SymPyCall
 
     @test N(angle(Sym(1) + Sym(2)*IM)) ≈ atan(2,1)
 
-    @test factorial(Sym(0)) == 1
-    @test factorial(Sym(7)) == 5040
+    @test sympy.factorial(Sym(0)) == 1
+    @test sympy.factorial(Sym(7)) == 5040
 
     @test sympy.factorial2(Sym(5)) == 15
     @test sympy.factorial2(Sym(-5)) == Sym(1)/3

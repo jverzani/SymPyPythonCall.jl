@@ -46,19 +46,19 @@ Differences from SymPy:
 
 * "types" are specified via calling `func` on the head of an expression: `func(sin(x))` -> `sin`, or directly through `sympy.sin`
 
-* functions are supported, but only with `PyCall` commands.
+* functions are not supported
 
 
 Examples (from the SymPy docs)
 
 ```jldoctest replace
-julia> using SymPy
+julia> using SymPyCall
 
-julia> x, y, z = symbols("x, y, z")
+julia> @syms x, y, z
 (x, y, z)
 
-julia> f = log(sin(x)) + tan(sin(x^2)); string(f) # `string(f)` only so doctest can run
-"log(sin(x)) + tan(sin(x^2))"
+julia> f = log(sin(x)) + tan(sin(x^2)); print(f) # `print(f)` only so doctest can run
+log(sin(x)) + tan(sin(x^2))
 
 ```
 
@@ -67,47 +67,23 @@ julia> f = log(sin(x)) + tan(sin(x^2)); string(f) # `string(f)` only so doctest 
 Types are specified through `func`:
 
 ```jldoctest replace
-julia> func = SymPy.Introspection.func
+julia> func = SymPyCall.Introspection.func
 func (generic function with 1 method)
 
-julia> replace(f, func(sin(x)), func(cos(x))) |> string  # type -> type
-"log(cos(x)) + tan(cos(x^2))"
+julia> replace(f, func(sin(x)), func(cos(x))) |> print  # type -> type
+log(cos(x)) + tan(cos(x^2))
 
-julia> replace(f, sympy.sin, sympy.cos)  |>  string
-"log(cos(x)) + tan(cos(x^2))"
+julia> #replace(f, sympy.sin, sympy.cos)  |>  print  # "log(cos(x)) + tan(cos(x^2))" **but fails**
 
-julia> sin(x).replace(sympy.sin, sympy.cos, map=true)
-(cos(x), Dict{Any, Any}(sin(x) => cos(x)))
-
-```
-
-The `func` function finds the head of an expression (`sin` and `cos` above). This could also have been written (perhaps more directly) as:
-
-```jldoctest replace
-julia> replace(f, sympy.sin, sympy.cos) |> string
-"log(cos(x)) + tan(cos(x^2))"
+julia> sin(x).replace(func(sin(x)), func(cos(x)), map=true)
+(cos(x), Dict{Sym, Sym}(sin(x) => cos(x)))
 
 ```
+
 
 ## "type" -> "function"
 
-To replace with a more complicated function, requires some assistance from `Python`, as an anonymous function must be defined witin Python, not `Julia`:
-
-```julia
-julia> import PyCall
-
-julia> ## Anonymous function a -> sin(2a)
-       PyCall.py\"\"\"
-       from sympy import sin, Mul
-       def anonfn(*args):
-           return sin(2*Mul(*args))
-       \"\"\")
-
-
-julia> replace(f, sympy.sin, PyCall.py"anonfn")
-                   ⎛   ⎛   2⎞⎞
-log(sin(2⋅x)) + tan⎝sin⎝2⋅x ⎠⎠
-```
+XXX
 
 ## "pattern" -> "expression"
 
@@ -117,14 +93,14 @@ Using "`Wild`" variables allows a pattern to be replaced by an expression:
 julia> a, b = Wild("a"), Wild("b")
 (a_, b_)
 
-julia> replace(f, sin(a), tan(2a)) |> string
-"log(tan(2*x)) + tan(tan(2*x^2))"
+julia> replace(f, sin(a), tan(2a)) |> print
+log(tan(2*x)) + tan(tan(2*x^2))
 
-julia> replace(f, sin(a), tan(a/2)) |> string
-"log(tan(x/2)) + tan(tan(x^2/2))"
+julia> replace(f, sin(a), tan(a/2)) |> print
+log(tan(x/2)) + tan(tan(x^2/2))
 
-julia> f.replace(sin(a), a) |> string
-"log(x) + tan(x^2)"
+julia> f.replace(sin(a), a) |> print
+log(x) + tan(x^2)
 
 julia> (x*y).replace(a*x, a)
 y
@@ -140,56 +116,17 @@ julia> replace(2x + y, a*x+b, b-a)  # y - 2
 y - 2
 
 julia> replace(2x + y, a*x+b, b-a, exact=false)  # y + 2/x
-    2
-y + ─
-    x
+y + 2/x
 ```
 
 ## "pattern" -> "func"
 
-The function is redefined, as a fixed argument is passed:
-
-```julia
-julia> PyCall.py\"\"\"
-       from sympy import sin
-       def anonfn(a):
-           return sin(2*a)
-       \"\"\"
-
-julia> replace(f, sin(a), PyCall.py"anonfn")
-                   ⎛   ⎛   2⎞⎞
-log(sin(2⋅x)) + tan⎝sin⎝2⋅x ⎠⎠
-```
+XXX
 
 ## "func" -> "func"
 
-```julia
+XXX
 
-julia> PyCall.py\"\"\"
-       def fn1(expr):
-           return expr.is_Number
-
-       def fn2(expr):
-           return expr**2
-       \"\"\"
-
-julia> replace(2*sin(x^3), PyCall.py"fn1", PyCall.py"fn2")
-     ⎛ 9⎞
-4⋅sin⎝x ⎠
-```
-
-```julia
-julia> PyCall.py\"\"\"
-       def fn1(x):
-           return x.is_Mul
-
-       def fn2(x):
-           return 2*x
-       \"\"\"
-
-julia> replace(x*(x*y + 1), PyCall.py"fn1", PyCall.py"fn2")
-2⋅x⋅(2⋅x⋅y + 1)
-```
 """
 function Base.replace(ex::Sym, query::Sym, fn::Function; exact=true, kwargs...)
     ## XXX this is failing!

@@ -5,11 +5,11 @@ struct Sym <: SymbolicObject
     py::Py
 end
 
-PythonCall.getpy(x::Sym) = x.py
+PythonCall.Py(x::Sym) = x.py
 PythonCall.ispy(x::Sym) = true
 
 function Base.show(io::IO, s::SymbolicObject)
-    out = PythonCall.pyrepr(String, getpy(s))
+    out = PythonCall.pyrepr(String, Py(s))
     out = replace(out, r"\*\*" => "^")
     print(io, out)
 end
@@ -19,7 +19,7 @@ function Base.getproperty(x::Sym, a::Symbol)
 
     a == :py && return getfield(x,a)
 
-    py = getpy(x)
+    py = Py(x)
     val = pygetattr(py, string(a), nothing)
     val === nothing && return nothing
 
@@ -65,13 +65,13 @@ end
 struct SymFunction <: SymbolicObject
     py::Py
 end
-PythonCall.getpy(u::SymFunction) = u.py
+PythonCall.Py(u::SymFunction) = u.py
 
 function SymFunction(x::AbstractString; kwargs...)
     λ = __sympy__.Function(x; unSymkwargs(kwargs)...)
     SymFunction(λ)
 end
-(u::SymFunction)(xs...) = ↑(getpy(u)(↓(xs)...))
+(u::SymFunction)(xs...) = ↑(Py(u)(↓(xs)...))
 
 # Steal this idea from ModelingToolkit
 # better than the **hacky** f'(0) stuff

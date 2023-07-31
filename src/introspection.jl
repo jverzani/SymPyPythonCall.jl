@@ -4,7 +4,7 @@ module Introspection
 
 import SymPyCall: Sym, asSymbolic
 using PythonCall
-import PythonCall: getpy
+import PythonCall: Py
 export args, func, funcname, class, classname, getmembers
 
 
@@ -16,7 +16,7 @@ export args, func, funcname, class, classname, getmembers
 Return name or ""
 """
 function funcname(x::Union{Sym, Py})
-    y = getpy(x)
+    y = Py(x)
     func = pygetattr(y, "func", nothing)
     func == nothing && return ""
     return string(func.__name__)
@@ -32,7 +32,7 @@ Return function head from an expression
 Every well-formed SymPy expression `ex` must either have `length(args(ex)) == 0` or
 `func(ex)(args(ex)...) = ex`.
 """
-func(ex::Sym) = return getpy(ex).func
+func(ex::Sym) = return Py(ex).func
 
 """
     args(x)
@@ -40,7 +40,7 @@ func(ex::Sym) = return getpy(ex).func
 Return arguments of `x`, as a tuple. (Empty if no `:args` property.)
 """
 function args(x::Union{Sym, Py})
-    asSymbolic(pygetattr(getpy(x), "args", ()))
+    asSymbolic(pygetattr(Py(x), "args", ()))
 end
 
 # return class or nothing

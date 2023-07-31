@@ -21,14 +21,10 @@ julia> using SymPyCall
 julia> @syms x::integer y::integer
 (x, y)
 
-julia> ask(𝑄.integer(x*y), And(𝑄.integer(x), 𝑄.integer(y)))
-ERROR: UndefVarError: And not defined
-Stacktrace:
- [1] top-level scope
-   @ none:1
+julia> ask(𝑄.integer(x*y), sympy.And(𝑄.integer(x), 𝑄.integer(y)))
+true
 
-julia> ## really slow isprime:
-       filter(x -> ask(𝑄.prime(x)), 1:10)
+julia> filter(x -> ask(𝑄.prime(x)), 1:10) ## really slow isprime:
 4-element Vector{Int64}:
  2
  3
@@ -39,9 +35,9 @@ julia> ## really slow isprime:
 """
 function ask(x::Sym, args...)
     val = sympy.ask(x, args...)
-    Bool(getpy(val) == pybuiltins.None) && return nothing
-    Bool(getpy(val) == pybuiltins.True) && return true
-    Bool(getpy(val) == pybuiltins.False) && return false
+    Bool(Py(val) == pybuiltins.None) && return nothing
+    Bool(Py(val) == pybuiltins.True) && return true
+    Bool(Py(val) == pybuiltins.False) && return false
     throw(DomainError("Argument not none, true, or false"))
 end
 

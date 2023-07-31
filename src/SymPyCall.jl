@@ -7,7 +7,7 @@ module SymPyCall
 
 # usings/imports
 using PythonCall
-import PythonCall: getpy
+import PythonCall: Py
 using SpecialFunctions
 using LinearAlgebra
 using Markdown
@@ -45,7 +45,6 @@ export sympy,
     𝑄, ask, refine,
     rewrite,
     Differential
-
 
 
 # define sympy in int

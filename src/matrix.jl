@@ -3,6 +3,14 @@
 # XXX has issue with @inferred
 # XXX link into pyconvert...
 
+Base.eachrow(M::Matrix{T}) where {T <: SymbolicObject} = (M[i,:] for i ∈ 1:size(M,1))
+function Base.view(A::AbstractArray{T,N}, I::Vararg{Any,M}) where {T <: SymbolicObject, N,M}
+    @show :view, A, I
+    A[I...] # can't take view!!
+end
+
+
+
 Base.promote_op(::T, ::Type{S}, ::Type{Sym}) where {T, S <: Number} = Sym
 Base.promote_op(::T, ::Type{Sym}, ::Type{S}) where {T, S <: Number} = Sym
 Base.promote_op(::T, ::Type{Sym}, ::Type{Sym}) where {T} = Sym # This helps out linear alg
@@ -38,19 +46,23 @@ for (smeth, jmod, jmeth) ∈ matrix_meths
 end
 
 
-function Base.getproperty(M::Matrix{Sym}, prop::Symbol)
-    val = pygetattr(↓(M), string(prop))
+function Base.getproperty(M::AbstractArray{<:Sym}, prop::Symbol)
+    MM = sympy.Matrix.val(↓(M))
+    val = pygetattr(MM, string(prop))
+    #val = pygetattr(↓(M), string(prop))
     meth = pygetattr(val, "__call__", nothing)
     meth == nothing && return Sym(val)
     return SymbolicCallable(meth)
 end
 
-function Base.getproperty(X::Vector{Sym}, prop::Symbol)
-    val = pygetattr(sympy.Matrix(Tuple(xᵢ for xᵢ ∈ X)), string(prop))
-    meth = pygetattr(val, "__call__", nothing)
-    meth == nothing && return Sym(val)
-    return SymbolicCallable(meth)
-end
+# function Base.getproperty(X::Vector{Sym}, prop::Symbol)
+#     val = pygetattr(sympy.Matrix.val(Tuple(xᵢ for xᵢ ∈ X)), string(prop))
+#     meth = pygetattr(val, "__call__", nothing)
+#     meth == nothing && return Sym(val)
+#     return SymbolicCallable(meth)
+# end
+
+LinearAlgebra.qr(A::AbstractArray{Sym,2}) = ↑(↓(A).QRdecomposition())
 
 # solve Ax=b for x, avoiding generic `lu`, which can be very slow for bigger n values
 # fix suggested by @olof3 in issue 355
@@ -69,9 +81,9 @@ function LinearAlgebra.:\(A::AbstractArray{Sym,2}, b::AbstractArray{S,1}) where 
 
 end
 
-function LinearAlgebra.:\(A::AbstractArray{T,2}, B::AbstractArray{S,2}) where {T <: Sym, S}
-    hcat([A \ bⱼ for bⱼ in eachcol(B)]...)
-end
+# function LinearAlgebra.:\(A::AbstractArray{T,2}, B::AbstractArray{S,2}) where {T <: Sym, S}
+#     hcat([A \ bⱼ for bⱼ in eachcol(B)]...)
+# end
 
 
 
@@ -81,10 +93,19 @@ LinearAlgebra.norm(x::AbstractVector{T}, args...; kwargs...) where {T <: Symboli
 
 
 ## Issue #359 so that A  +  λI is of type Sym
-Base.:+(A::AbstractMatrix{T}, J::UniformScaling) where {T <: SymbolicObject} = (n=LinearAlgebra.checksquare(A); A .+ J.λ*I(n))
-Base.:+(A::AbstractMatrix, J::UniformScaling{T}) where {T <: SymbolicObject} = (n=LinearAlgebra.checksquare(A); A .+ J.λ*I(n))
-Base.:+(A::AbstractMatrix{T}, J::UniformScaling{T}) where {T <: SymbolicObject} = (n=LinearAlgebra.checksquare(A); A .+ J.λ*I(n))
+Base.:+(A::AbstractMatrix{T}, J::UniformScaling) where {T <: SymbolicObject}    = _sym_plus_I(A,J)
+Base.:+(A::AbstractMatrix, J::UniformScaling{T}) where {T <: SymbolicObject}    = _sym_plus_I(A,J)
+Base.:+(A::AbstractMatrix{T}, J::UniformScaling{T}) where {T <: SymbolicObject} = _sym_plus_I(A,J)
 
-Base.:-(J::UniformScaling, A::AbstractMatrix{T}) where {T <: SymbolicObject} = (-A) + J
-Base.:-(J::UniformScaling{T}, A::AbstractMatrix) where {T <: SymbolicObject} = (-A) + J
+Base.:-(J::UniformScaling, A::AbstractMatrix{T}) where {T <: SymbolicObject}    = (-A) + J
+Base.:-(J::UniformScaling{T}, A::AbstractMatrix) where {T <: SymbolicObject}    = (-A) + J
 Base.:-(J::UniformScaling{T}, A::AbstractMatrix{T}) where {T <: SymbolicObject} = (-A) + J
+
+function _sym_plus_I(A::AbstractArray{T,N}, J::UniformScaling{S}) where {T, N, S}
+    n = LinearAlgebra.checksquare(A)
+    B = convert(AbstractArray{promote_type(T,S),N}, copy(A))
+    for i ∈ 1:n
+        B[i,i] += J.λ
+    end
+    B
+end
