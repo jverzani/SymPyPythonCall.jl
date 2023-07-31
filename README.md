@@ -27,7 +27,7 @@ There would be a few deprecations:
 
 * What to do with matrices? Using `Matrix{Sym}` with no `SymMatrix` type expected. Views seem off, so for now a copy is made.
 
-* no new special functions exported, just the ones in SpecialFunctions.jl
+* no new special functions exported, just the ones in `SpecialFunctions.jl`
 
 
 ## Installing `sympy`,
