@@ -54,7 +54,7 @@ Examples (from the SymPy docs)
 ```jldoctest replace
 julia> using SymPyCall
 
-julia> x, y, z = symbols("x, y, z")
+julia> @syms x, y, z
 (x, y, z)
 
 julia> f = log(sin(x)) + tan(sin(x^2)); print(f) # `print(f)` only so doctest can run
@@ -76,17 +76,10 @@ log(cos(x)) + tan(cos(x^2))
 julia> #replace(f, sympy.sin, sympy.cos)  |>  print  # "log(cos(x)) + tan(cos(x^2))" **but fails**
 
 julia> sin(x).replace(func(sin(x)), func(cos(x)), map=true)
-(cos(x), Dict{Any, Any}(sin(x) => cos(x)))
+(cos(x), Dict{Sym, Sym}(sin(x) => cos(x)))
 
 ```
 
-The `func` function finds the head of an expression (`sin` and `cos` above). This could also have been written (perhaps more directly) as:
-
-```jldoctest replace
-julia> replace(f, sympy.sin, sympy.cos) |> string
-"log(cos(x)) + tan(cos(x^2))"
-
-```
 
 ## "type" -> "function"
 
