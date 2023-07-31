@@ -20,8 +20,7 @@ It owes an enormous debt to the tutorial for using SymPy within Python which may
 [here](http://docs.sympy.org/dev/tutorial/index.html). The overall structure and many examples are taken from that work, with adjustments and additions to illustrate the differences due to using `SymPy` within `Julia`.
 
 
-After installing `SymPy`, which is discussed in the package's `README`
-file, we must first load it into `Julia` with the standard command
+After installing `SymPyCall` we must first load it into `Julia` with the standard command
 `using`:
 
 
@@ -91,7 +90,7 @@ The `@syms` macro is recommended, and will be modeled in the following, as it ma
 
 ### Assumptions
 
-Finally, there is the `symbols` constructor for producing symbolic objects. With `symbols` it is
+Finally, there is the `symbols` constructor for producing symbolic objects. With `symbols` (and with `@syms`) it is
 possible to pass assumptions onto the variables. A list of possible
 assumptions is
 [here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions). Some
@@ -155,15 +154,13 @@ use `Sym` to create a variable from a function name in Base.
 
 ### Special constants
 
-`Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPy`. For example, these two constants are defined (where `oo` is for infinity):
+`Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPyCall`. For example, these two constants are defined (where `oo` is for infinity):
 
 ```jldoctest introduction
 julia> PI,  oo
 (pi, oo)
 
 ```
-
-(The pretty printing of SymPy objects does not work for tuples.)
 
 Numeric values themselves can be symbolic. This example shows the
 difference. The first `asin` call dispatches to `Julia`'s `asin`
@@ -221,7 +218,7 @@ z + 1 + pi
 
 !!! note
 
-    The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. `SymPy` imports most all generic functions from the underlying `sympy` module and specializes them on a symbolic first argument.
+    The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. `SymPyCall` imports many generic functions from the underlying `sympy` module and specializes them on a symbolic first argument.
 
     For `subs`, the simple substitution `ex.object(x,a)` is similar to simple function evaluation, so `Julia`'s call notation will work. To specify the pairing off of `x` and `a`, the `=>`  pairs notation is used.
 
@@ -287,9 +284,9 @@ necessary at times if `N` does not give the desired type.
 
 ## Algebraic expressions
 
-`SymPy` overloads many of `Julia`'s functions to work with symbolic objects, such as seen above with `asin`. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related `SymPy` functions.
+`SymPyCall` overloads many of `Julia`'s functions to work with symbolic objects, such as seen above with `asin`. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related SymPy functions.
 
-In most all  cases, thinking about this distinction between numbers and symbolic numbers is unnecessary, as numeric values passed to `SymPy` functions are typically promoted to symbolic expressions. This conversion will take math constants to their corresponding `SymPy` counterpart, rational expressions to rational expressions, and floating point values to floating point values. However there are edge cases. An expression like `1//2 * pi * x` will differ from the seemingly identical  `1//2 * (pi * x)`. The former will produce a floating point value from `1//2 * pi` before being promoted to a symbolic instance. Using the symbolic value `PI` makes this expression work either way.
+In most all  cases, thinking about this distinction between numbers and symbolic numbers is unnecessary, as numeric values passed to `SymPyCall` functions are typically promoted to symbolic expressions. This conversion will take math constants to their corresponding `SymPyCall` counterpart, rational expressions to rational expressions, and floating point values to floating point values. However there are edge cases. An expression like `1//2 * pi * x` will differ from the seemingly identical  `1//2 * (pi * x)`. The former will produce a floating point value from `1//2 * pi` before being promoted to a symbolic instance. Using the symbolic value `PI` makes this expression work either way.
 
 Most of `Julia`'s
 [mathematical](http://julia.readthedocs.org/en/latest/manual/mathematical-operations/#elementary-functions)
@@ -301,7 +298,7 @@ expected, as the former call first dispatches to a generic defintion,
 but the latter two expressions do not.
 
 
-`SymPy` makes it very easy to work with polynomial and rational expressions. First we create some variables:
+`SymPyCall` makes it very easy to work with polynomial and rational expressions. First we create some variables:
 
 ```jldoctest introduction
 julia> @syms x y z
@@ -366,7 +363,7 @@ x*y^2 + x + y*(x^2 + x)
 
 These are identical expressions, though viewed differently.
 
-A more broad-brush approach is to let `SymPy` simplify the values. In this case, the common value of `x` is factored out:
+A more broad-brush approach is to let `SymPyCall` simplify the values. In this case, the common value of `x` is factored out:
 
 ```jldoctest introduction
 julia> simplify(q)
@@ -613,7 +610,7 @@ julia> q.coeffs()
 
 !!! note
 
-    XXX This is SYmPy not SymPyCall Either `sympy.poly` or `sympy.Poly` may be used. The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPy` is loaded. To access it, the object must be qualified by its containing module, in this case `Poly`. Were it to be used frequently, an alias could be used, as in `const Poly=sympy.Poly` *or* the `import_from` function, as in `import_from(sympy, :Poly)`. The latter has some attempt to avoid naming collisions.
+    This is `sympy` not `SymPyCall`. Using `sympy.Poly` is not supported. The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPyCa;;` is loaded.
 
 
 ## Polynomial roots: solve, real_roots, polyroots, nroots
@@ -640,7 +637,7 @@ Unlike `factor` -- which only factors over rational factors --
 [Abel-Ruffini theorem](http://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem))
 that for degree 5 polynomials, or higher, it is not always possible to
 express the roots in terms of radicals. However, when the roots are
-rational `SymPy` can have success:
+rational SymPy can have success:
 
 
 ```jldoctest introduction
@@ -657,10 +654,6 @@ julia> real_roots(p)
   3
 
 ```
-
-!!! note "Why `string`?"
-
-    XXX THIS ISN"T CURRENTLY NEEDED, so we have commented them out. XXX The uses of `string(p)` above and elsewhere throughout the introduction is only for technical reasons related to doctesting and how `Documenter.jl` parses  the expected output. This usage is not idiomatic, or suggested; it  only allows the cell  to  be tested programatically for  regressions. Similarly, expected errors  are  wrapped in `try`-`catch` blocks just  for testing purposes.
 
 
 In this example, the degree of `p` is 8, but only the 6 real roots
@@ -781,8 +774,7 @@ Union(ImageSet(Lambda(_n, 2*_n*pi + 5*pi/4), Integers), ImageSet(Lambda(_n, 2*_n
 ```
 
 The output of `solveset` is a set, rather than a vector or
-dictionary. To get the values requires some work. For *finite sets* we collect the elements
-with `collect`, but first we must convert to a `Julia` `Set`:
+dictionary.
 
 ```jldoctest introduction
 julia> v = solveset(x^2 - 4)
@@ -790,32 +782,6 @@ Set{Sym} with 2 elements:
   2
   -2
 ```
-
-```
-XXX This is not current
-julia> collect(Set(v...))
-```
-
-This composition is done in the `elements` function:
-
-```
-XXX jldoctest introduction not current
-julia> elements(v)
-
-```
-
-!!! note "no elements"
-    In `SymPyCall` the `elements` function is not used, just use `collect`, as in `collect(v)
-
-```jldoctest introduction
-julia> collect(v)
-2-element Vector{Sym}:
-  2
- -2
-```
-
-
-The `elements` function does not work for more complicated (non-finite) sets, such as `u`. For these, the `contains` method may be useful to query the underlying elements
 
 
 
@@ -931,7 +897,7 @@ unknowns. When that is not the case, one can specify the variables to
 solve for as a vector. In this example, we find a quadratic polynomial
 that approximates $\cos(x)$ near $0$:
 
-```julia
+```jldoctest introduction
 julia> a,b,c,h = symbols("a,b,c,h", real=true)
 (a, b, c, h)
 
@@ -948,20 +914,19 @@ julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
        -a*h^2 - b*h - c + cos(h)
  -4*a*h^2 - 2*b*h - c + cos(2*h)
 
-julia> d = solve(exs, (a,b,c))
-Dict{Any, Any} with 3 entries:
-  a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
-  c => 1
-  b => 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)
+julia> d = solve(exs, (a,b,c));
+
+julia> d[a], d[b], d[c]
+(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2), 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h), 1)
 
 ```
 
-Again, a dictionary is returned. The polynomial itself can be found by
+Again, a dictionary is returned, though we display its named elements individually. The polynomial itself can be found by
 substituting back in for `a`, `b`, and `c`:
 
-```julia
-julia> quad_approx = p.subs(d)#; string(quad_approx)
-"x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1"
+```jldoctest introduction
+julia> quad_approx = p.subs(d)
+x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1
 
 ```
 
@@ -971,7 +936,7 @@ Finally for `solve`, we show one way to re-express the polynomial $a_2x^2 + a_1x
 as $b_2(x-c)^2 + b_1(x-c) + b_0$ using `solve` (and not, say, an
 expansion theorem.)
 
-```julia
+```jldoctest introduction
 julia> n = 3
 3
 
@@ -988,18 +953,20 @@ julia> p = sum([as[i+1]*x^i for i in 0:(n-1)]);
 
 julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)]);
 
-julia> solve(p-q, bs)
-Dict{Any, Any} with 3 entries:
-  bs₁ => as₁ + as₂*c + as₃*c^2
-  bs₂ => as₂ + 2*as₃*c
-  bs₃ => as₃
+julia> d = solve(p-q, bs);
+
+julia> [k => d[k] for k ∈ bs]
+3-element Vector{Pair{Sym, Sym}}:
+ bs₁ => as₁ + as₂*c + as₃*c^2
+ bs₂ => as₂ + 2*as₃*c
+ bs₃ => as₃
 
 ```
 
 
 ### Solving using logical operators
 
-The `solve` function does not need to just solve `ex = 0`. There are other means to specify an equation. Ideally, it would be nice to say `ex1 == ex2`, but the interpretation of `==` is not for this. Rather, `SymPy` introduces `Eq` for equality. So this expression
+The `solve` function does not need to just solve `ex = 0`. There are other means to specify an equation. Ideally, it would be nice to say `ex1 == ex2`, but the interpretation of `==` is not for this. Rather, `SymPyCall` introduces `Eq` for equality. So this expression
 
 ```jldoctest introduction
 julia> solve(Eq(x, 1))
@@ -1026,7 +993,7 @@ julia> solve(x ⩵ 1)
 
 Here is an alternative way of asking a previous question on a pair of linear equations:
 
-```julia
+```jldoctest introduction
 julia> x, y = symbols("x,y", real=true)
 (x, y)
 
@@ -1035,10 +1002,10 @@ julia> exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
   2⋅x + 3⋅y = 6
  3⋅x - 4⋅y = 12
 
-julia> d = solve(exs)
-Dict{Any, Any} with 2 entries:
-  x => 60/17
-  y => -6/17
+julia> d = solve(exs);
+
+julia> d[x], d[y]
+(Fraction(60, 17), Fraction(-6, 17))
 
 ```
 

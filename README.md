@@ -17,24 +17,23 @@ There would be a few deprecations:
 
 * `elements` for sets would be removed (convert to a `Set` by default)
 
-* `sympy.poly` *not* `sympy.Poly`, though `sympy.Poly` does work for now via a hacky thing to manage `ManagedProperties`,
+* `sympy.poly` *not* `sympy.Poly`
 
 * `limit(ex, x, c)` deprecated; use `limit(ex, x=>c)` or `sympy.limit`
 
-* `Base.show` isn't *currently* using pretty priting
+* `Base.show` isn't *currently* using pretty printing
 
 * Would `Q` be ported? (Use `\itQ` for now)
 
-* What to do with matrices? Using `Matrix{Sym}` with no `SymMatrix` type expected
-
-* would we export `CommonEq` symbols?
+* What to do with matrices? Using `Matrix{Sym}` with no `SymMatrix` type expected. Views seem off, so for now a copy is made.
 
 * no new special functions exported, just the ones in SpecialFunctions.jl
 
 
 ## Installing `sympy`,
 
-To install `sympy` in `PythonCall` isn't hard; below shows how it may be done. If this were to become registered, automating this would be very desirable.
+The `sympy` package for Python should install with the package through `PythonCall` and `CondaPkg`. If not,
+to install `sympy` in `PythonCall` isn't hard; below shows how it may be done.
 
 ```
 using PythonCall
