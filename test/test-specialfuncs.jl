@@ -1,8 +1,8 @@
-using SymPyCall
+using SymPyPythonCall
 using LinearAlgebra
 using Test
 
-## SymPyCall only is adding methods for those found in SpecialFunctions
+## SymPyPythonCall only is adding methods for those found in SpecialFunctions
 ## so not the special polynomials, etc.
 using SpecialFunctions
 

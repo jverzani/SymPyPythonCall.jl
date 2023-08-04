@@ -2,7 +2,7 @@
 ## Module for Introspection
 module Introspection
 
-import SymPyCall: Sym, asSymbolic
+import SymPyPythonCall: Sym, asSymbolic
 using PythonCall
 import PythonCall: Py
 export args, func, funcname, class, classname, getmembers

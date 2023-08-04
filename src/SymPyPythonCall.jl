@@ -1,9 +1,9 @@
 """
-    SymPyCall
+    SymPyPythonCall
 
 Module to call Python's SymPy package from Julia using PythonCall
 """
-module SymPyCall
+module SymPyPythonCall
 
 # usings/imports
 using PythonCall

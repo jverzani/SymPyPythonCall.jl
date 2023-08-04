@@ -1,9 +1,9 @@
-# A SymPyCall introduction
+# A SymPyPythonCall introduction
 
-!!! note "SymPyCall"
+!!! note "SymPyPythonCall"
 
-    This is a test of what works in `SymPyCall`.
-	`SymPyCall` is just a temporary package for now, with the expectation that it may become `SymPy`.
+    This is a test of what works in `SymPyPythonCall`.
+	`SymPyPythonCall` is just a temporary package for now, with the expectation that it may become `SymPy`.
 	There would be a few deprecations:
 	* `@vars` would be deprecated; use `@syms` only
 	* `Base.show` isn't *currently* using pretty printing
@@ -20,17 +20,17 @@ It owes an enormous debt to the tutorial for using SymPy within Python which may
 [here](http://docs.sympy.org/dev/tutorial/index.html). The overall structure and many examples are taken from that work, with adjustments and additions to illustrate the differences due to using `SymPy` within `Julia`.
 
 
-After installing `SymPyCall` we must first load it into `Julia` with the standard command
+After installing `SymPyPythonCall` we must first load it into `Julia` with the standard command
 `using`:
 
 
 ```@setup introduction
-using SymPyCall
+using SymPyPythonCall
 sympy.init_printing(use_latex=true)
 ```
 
 ```jldoctest introduction
-julia> using SymPyCall
+julia> using SymPyPythonCall
 ```
 
 
@@ -154,7 +154,7 @@ use `Sym` to create a variable from a function name in Base.
 
 ### Special constants
 
-`Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPyCall`. For example, these two constants are defined (where `oo` is for infinity):
+`Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPyPythonCall`. For example, these two constants are defined (where `oo` is for infinity):
 
 ```jldoctest introduction
 julia> PI,  oo
@@ -218,7 +218,7 @@ z + 1 + pi
 
 !!! note
 
-    The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. `SymPyCall` imports many generic functions from the underlying `sympy` module and specializes them on a symbolic first argument.
+    The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. `SymPyPythonCall` imports many generic functions from the underlying `sympy` module and specializes them on a symbolic first argument.
 
     For `subs`, the simple substitution `ex.object(x,a)` is similar to simple function evaluation, so `Julia`'s call notation will work. To specify the pairing off of `x` and `a`, the `=>`  pairs notation is used.
 
@@ -284,9 +284,9 @@ necessary at times if `N` does not give the desired type.
 
 ## Algebraic expressions
 
-`SymPyCall` overloads many of `Julia`'s functions to work with symbolic objects, such as seen above with `asin`. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related SymPy functions.
+`SymPyPythonCall` overloads many of `Julia`'s functions to work with symbolic objects, such as seen above with `asin`. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related SymPy functions.
 
-In most all  cases, thinking about this distinction between numbers and symbolic numbers is unnecessary, as numeric values passed to `SymPyCall` functions are typically promoted to symbolic expressions. This conversion will take math constants to their corresponding `SymPyCall` counterpart, rational expressions to rational expressions, and floating point values to floating point values. However there are edge cases. An expression like `1//2 * pi * x` will differ from the seemingly identical  `1//2 * (pi * x)`. The former will produce a floating point value from `1//2 * pi` before being promoted to a symbolic instance. Using the symbolic value `PI` makes this expression work either way.
+In most all  cases, thinking about this distinction between numbers and symbolic numbers is unnecessary, as numeric values passed to `SymPyPythonCall` functions are typically promoted to symbolic expressions. This conversion will take math constants to their corresponding `SymPyPythonCall` counterpart, rational expressions to rational expressions, and floating point values to floating point values. However there are edge cases. An expression like `1//2 * pi * x` will differ from the seemingly identical  `1//2 * (pi * x)`. The former will produce a floating point value from `1//2 * pi` before being promoted to a symbolic instance. Using the symbolic value `PI` makes this expression work either way.
 
 Most of `Julia`'s
 [mathematical](http://julia.readthedocs.org/en/latest/manual/mathematical-operations/#elementary-functions)
@@ -298,7 +298,7 @@ expected, as the former call first dispatches to a generic defintion,
 but the latter two expressions do not.
 
 
-`SymPyCall` makes it very easy to work with polynomial and rational expressions. First we create some variables:
+`SymPyPythonCall` makes it very easy to work with polynomial and rational expressions. First we create some variables:
 
 ```jldoctest introduction
 julia> @syms x y z
@@ -363,7 +363,7 @@ x*y^2 + x + y*(x^2 + x)
 
 These are identical expressions, though viewed differently.
 
-A more broad-brush approach is to let `SymPyCall` simplify the values. In this case, the common value of `x` is factored out:
+A more broad-brush approach is to let `SymPyPythonCall` simplify the values. In this case, the common value of `x` is factored out:
 
 ```jldoctest introduction
 julia> simplify(q)
@@ -610,7 +610,7 @@ julia> q.coeffs()
 
 !!! note
 
-    This is `sympy` not `SymPyCall`. Using `sympy.Poly` is not supported. The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPyCa;;` is loaded.
+    This is `sympy` not `SymPyPythonCall`. Using `sympy.Poly` is not supported. The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPyCa;;` is loaded.
 
 
 ## Polynomial roots: solve, real_roots, polyroots, nroots
@@ -968,7 +968,7 @@ julia> [k => d[k] for k ∈ bs]
 
 ### Solving using logical operators
 
-The `solve` function does not need to just solve `ex = 0`. There are other means to specify an equation. Ideally, it would be nice to say `ex1 == ex2`, but the interpretation of `==` is not for this. Rather, `SymPyCall` introduces `Eq` for equality. So this expression
+The `solve` function does not need to just solve `ex = 0`. There are other means to specify an equation. Ideally, it would be nice to say `ex1 == ex2`, but the interpretation of `==` is not for this. Rather, `SymPyPythonCall` introduces `Eq` for equality. So this expression
 
 ```jldoctest introduction
 julia> solve(Eq(x, 1))

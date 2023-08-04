@@ -1,5 +1,5 @@
-using SymPyCall
-import SymPyCall: Latexify
+using SymPyPythonCall
+import SymPyPythonCall: Latexify
 using Test
 
 @testset "Latexify" begin

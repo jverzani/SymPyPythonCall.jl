@@ -1,4 +1,4 @@
-using SymPyCall
+using SymPyPythonCall
 using Test
 
 @testset "Logical" begin

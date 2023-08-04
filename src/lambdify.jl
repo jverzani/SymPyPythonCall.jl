@@ -54,10 +54,10 @@ fn_map = Dict(
     "Min" => :min,
     "Max" => :max,
     "Poly" => :identity,
-    "Piecewise" => :(SymPyCall._piecewise),
-    "Order" => :(SymPyCall.__ZERO__), # :(as...) -> 0,
-    "And" => :(SymPyCall.__ALL__), #:((as...) -> all(as)), #:(&),
-    "Or" =>  :(SymPyCall.__ANY__), #:((as...) -> any(as)), #:(|),
+    "Piecewise" => :(SymPyPythonCall._piecewise),
+    "Order" => :(SymPyPythonCall.__ZERO__), # :(as...) -> 0,
+    "And" => :(SymPyPythonCall.__ALL__), #:((as...) -> all(as)), #:(&),
+    "Or" =>  :(SymPyPythonCall.__ANY__), #:((as...) -> any(as)), #:(|),
     "Less" => :(<),
     "LessThan" => :(<=),
     "StrictLessThan" => :(<),
@@ -69,7 +69,7 @@ fn_map = Dict(
     "Greater" => :(>),
     "conjugate" => :conj,
     "atan2" => :atan,
-    "Heaviside" => :(SymPyCall.__HEAVISIDE__),
+    "Heaviside" => :(SymPyPythonCall.__HEAVISIDE__),
 )
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
@@ -135,7 +135,7 @@ Take a symbolic expression and return a `Julia` function or expression to build 
 Example:
 
 ```jldoctest
-julia> using SymPyCall
+julia> using SymPyPythonCall
 
 julia> @syms x y z
 (x, y, z)

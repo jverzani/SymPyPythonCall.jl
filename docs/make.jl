@@ -2,22 +2,22 @@ ENV["PLOTS_TEST"] = "true"
 ENV["GKSwstype"] = "100"
 
 
-using SymPyCall
+using SymPyPythonCall
 using Documenter
 
 makedocs(sitename="My Documentation")
 
 
-#DocMeta.setdocmeta!(SymPyCall, :DocTestSetup, :(using SymPyCall); recursive=true)
+#DocMeta.setdocmeta!(SymPyPythonCall, :DocTestSetup, :(using SymPyPythonCall); recursive=true)
 
 # makedocs(;
-#     modules=[SymPyCall],
+#     modules=[SymPyPythonCall],
 #     authors="jverzani <jverzani@gmail.com> and contributors",
-#     repo="https://github.com/jverzani/SymPyCall.jl/blob/{commit}{path}#{line}",
-#     sitename="SymPyCall.jl",
+#     repo="https://github.com/jverzani/SymPyPythonCall.jl/blob/{commit}{path}#{line}",
+#     sitename="SymPyPythonCall.jl",
 #     format=Documenter.HTML(;
 #         prettyurls=get(ENV, "CI", "false") == "true",
-#         canonical="https://jverzani.github.io/SymPyCall.jl",
+#         canonical="https://jverzani.github.io/SymPyPythonCall.jl",
 #         assets=String[],
 #     ),
 #     pages=[
@@ -27,6 +27,6 @@ makedocs(sitename="My Documentation")
 # )
 
 # # deploydocs(;
-#     repo="github.com/jverzani/SymPyCall.jl",
+#     repo="github.com/jverzani/SymPyPythonCall.jl",
 #     devbranch="main",
 # )

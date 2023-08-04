@@ -40,10 +40,10 @@ julia> x ^ x
 Python: x**x
 ```
 
-`SymPyCall` wraps the `Py` objects in its `Sym` class to provide a means to dispatch familiar `Julia` generics:
+`SymPyPythonCall` wraps the `Py` objects in its `Sym` class to provide a means to dispatch familiar `Julia` generics:
 
 ```jldoctest overview
-julia> using SymPyCall
+julia> using SymPyPythonCall
 
 ```
 
@@ -61,7 +61,7 @@ The package also provides methods for some sympy methods, such as `simplify` abo
 simplify(x::Sym, args...; kwargs...) = ↑(sympy.simplify(↓(x), ↓(args)...; ↓(kwargs)...))
 ```
 
-The `expand_log` function is not wrapped as such, but can be called from the `sympy` object exported by `SymPyCall`:
+The `expand_log` function is not wrapped as such, but can be called from the `sympy` object exported by `SymPyPythonCall`:
 
 ```jldoctest overview
 julia> @syms x::real
@@ -83,7 +83,7 @@ We follow part of the `SymPy` docs to see how to access one of the numerous exte
 
 
 ```jldoctest overview
-julia> import SymPyCall.PythonCall: pyimport
+julia> import SymPyPythonCall.PythonCall: pyimport
 
 julia> stats = pyimport("sympy.stats");
 ```

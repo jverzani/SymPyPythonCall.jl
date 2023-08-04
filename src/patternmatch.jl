@@ -52,7 +52,7 @@ Differences from SymPy:
 Examples (from the SymPy docs)
 
 ```jldoctest replace
-julia> using SymPyCall
+julia> using SymPyPythonCall
 
 julia> @syms x, y, z
 (x, y, z)
@@ -67,7 +67,7 @@ log(sin(x)) + tan(sin(x^2))
 Types are specified through `func`:
 
 ```jldoctest replace
-julia> func = SymPyCall.Introspection.func
+julia> func = SymPyPythonCall.Introspection.func
 func (generic function with 1 method)
 
 julia> replace(f, func(sin(x)), func(cos(x))) |> print  # type -> type

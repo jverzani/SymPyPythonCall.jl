@@ -5,7 +5,6 @@
 
 Base.eachrow(M::Matrix{T}) where {T <: SymbolicObject} = (M[i,:] for i ∈ 1:size(M,1))
 function Base.view(A::AbstractArray{T,N}, I::Vararg{Any,M}) where {T <: SymbolicObject, N,M}
-    @show :view, A, I
     A[I...] # can't take view!!
 end
 

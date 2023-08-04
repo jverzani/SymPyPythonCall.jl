@@ -87,7 +87,7 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
-[[deps.SymPyCall]]
+[[deps.SymPyPythonCall]]
 path = ".."
 uuid = "bc8888f7-b21e-4b7c-a06a-5d9c9496438c"
 version = "0.1.0"
