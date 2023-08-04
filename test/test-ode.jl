@@ -1,4 +1,4 @@
-using SymPyCall
+using SymPyPythonCall
 using Test
 
 # XXX no export SymFunction -- use @syms

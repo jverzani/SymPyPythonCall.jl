@@ -4,5 +4,5 @@
 ```
 
 ```@autodocs
-Modules = [SymPyCall]
+Modules = [SymPyPythonCall]
 ```

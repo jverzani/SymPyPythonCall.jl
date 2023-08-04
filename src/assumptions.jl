@@ -16,7 +16,7 @@ Returns `true`, `false`, or `nothing`; [ask](https://docs.sympy.org/dev/modules/
 Example:
 
 ```jldoctest ask
-julia> using SymPyCall
+julia> using SymPyPythonCall
 
 julia> @syms x::integer y::integer
 (x, y)
@@ -88,11 +88,11 @@ ask(x::Nothing, args...) = x
 # julia> ask(𝑄.negative(y))  # false
 # false
 
-# julia> ask(SymPyCall.Q.positive(x))  # `nothing`
+# julia> ask(SymPyPythonCall.Q.positive(x))  # `nothing`
 
-# julia> ask(SymPyCall..Q.positive(x^2)) # `nothing` -- might be 0
+# julia> ask(SymPyPythonCall..Q.positive(x^2)) # `nothing` -- might be 0
 
-# julia> ask(SymPyCall.Q.positive(1 + x^2)) # true  -- must be postive now.
+# julia> ask(SymPyPythonCall.Q.positive(1 + x^2)) # true  -- must be postive now.
 # true
 # ```
 
@@ -117,7 +117,7 @@ ask(x::Nothing, args...) = x
 # matrices are not used, though a replacement is given.
 # """
 # module Q
-# import SymPyCall: sympy
+# import SymPyPythonCall: sympy
 # import PythonCall
 # import LinearAlgebra: det, norm
 
@@ -175,20 +175,20 @@ ask(x::Nothing, args...) = x
 # end
 
 
-# symmetric(M::Array{T,2}) where {T <: SymPyCall.Sym} = SymPyCall.issymmetric(M)
-# function invertible(M::Array{T,2}) where {T <: SymPyCall.Sym}
+# symmetric(M::Array{T,2}) where {T <: SymPyPythonCall.Sym} = SymPyPythonCall.issymmetric(M)
+# function invertible(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
 #     d = det(M)
-#     pos = SymPyCall.ask(positive(d))
+#     pos = SymPyPythonCall.ask(positive(d))
 #     if pos == nothing
 #         return nothing
 #     elseif pos == true
 #         return true
 #     end
-#     neg = SymPyCall.ask(negative(d))
+#     neg = SymPyPythonCall.ask(negative(d))
 #     if neg == nothing
 #         return nothing
 #     end
-#     z = SymPyCall.ask(zero(d))
+#     z = SymPyPythonCall.ask(zero(d))
 #     if z == nothing
 #         return nothing
 #     elseif z == true
@@ -198,15 +198,15 @@ ask(x::Nothing, args...) = x
 #     return true
 # end
 
-# function singular(M::Array{T,2}) where {T <: SymPyCall.Sym}
+# function singular(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
 #     !invertible(M)
 # end
 
-# function orthogonal(M::Array{T,2}) where {T <: SymPyCall.Sym}
-#     vals = SymPyCall.simplify.(SymPyCall.simplify.(M*transpose(M)) .== one(T))
+# function orthogonal(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
+#     vals = SymPyPythonCall.simplify.(SymPyPythonCall.simplify.(M*transpose(M)) .== one(T))
 #     no_nothing = 0
 #     for val in vals
-#         a = SymPyCall.ask(zero(val))
+#         a = SymPyPythonCall.ask(zero(val))
 #         if a == nothing
 #             no_nothing += 1
 #         elseif a == false
@@ -219,11 +219,11 @@ ask(x::Nothing, args...) = x
 # end
 
 
-# function unitary(M::Array{T,2}) where {T <: SymPyCall.Sym}
-#     vals = SymPyCall.simplify.(SymPyCall.simplify.(M*ctranspose(M)) .== one(T))
+# function unitary(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
+#     vals = SymPyPythonCall.simplify.(SymPyPythonCall.simplify.(M*ctranspose(M)) .== one(T))
 #     no_nothing = 0
 #     for val in vals
-#         a = SymPyCall.ask(zero(val))
+#         a = SymPyPythonCall.ask(zero(val))
 #         if a == nothing
 #             no_nothing += 1
 #         elseif a == false
@@ -235,13 +235,13 @@ ask(x::Nothing, args...) = x
 #     return true
 # end
 
-# function normal(M::Array{T,2}) where {T <: SymPyCall.Sym}
+# function normal(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
 #     lhs = ctranspose(M) * M
 #     rhs = M * ctranspose(M)
-#     vals = zero.(SymPyCall.simplify.(lhs - rhs))
+#     vals = zero.(SymPyPythonCall.simplify.(lhs - rhs))
 #     no_nothing = 0
 #     for val in vals
-#         a = SymPyCall.ask(val)
+#         a = SymPyPythonCall.ask(val)
 #         if a == nothing
 #             no_nothing += 1
 #         elseif a == false
@@ -254,14 +254,14 @@ ask(x::Nothing, args...) = x
 # end
 
 # # Use [Sylvester's](https://en.wikipedia.org/wiki/Sylvester%27s_criterion) Criteria
-# function positive_definite(M::Array{T,2}) where {T <: SymPyCall.Sym}
-#     !SymPyCall.ask(square(M)) && return false
-#     !SymPyCall.ask(symmetric(M))  && return false
+# function positive_definite(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
+#     !SymPyPythonCall.ask(square(M)) && return false
+#     !SymPyPythonCall.ask(symmetric(M))  && return false
 #     m, n = size(M)
 #     no_false = 0
 #     no_nothing = 0
 #     for i in 1:m
-#         a = SymPyCall.ask(Q.positive(det(M[1:i, 1:i])))
+#         a = SymPyPythonCall.ask(Q.positive(det(M[1:i, 1:i])))
 #         if a == nothing no_nothing += 1 end
 #         if a == false no_false += 1 end
 #     end
@@ -276,24 +276,24 @@ ask(x::Nothing, args...) = x
 
 
 
-# upper_triangular(M::Array{T,2}) where {T <: SymPyCall.Sym} = SymPyCall.istriu(M)
-# lower_triangular(M::Array{T,2}) where {T <: SymPyCall.Sym} = SymPyCall.istril(M)
-# diagonal(M::Array{T,2}) where {T <: SymPyCall.Sym} = upper_triangular(M) && lower_triangular(M)
-# triangular(M::Array{T,2}) where {T <: SymPyCall.Sym} = upper_triangular(M) || lower_triangular(M)
+# upper_triangular(M::Array{T,2}) where {T <: SymPyPythonCall.Sym} = SymPyPythonCall.istriu(M)
+# lower_triangular(M::Array{T,2}) where {T <: SymPyPythonCall.Sym} = SymPyPythonCall.istril(M)
+# diagonal(M::Array{T,2}) where {T <: SymPyPythonCall.Sym} = upper_triangular(M) && lower_triangular(M)
+# triangular(M::Array{T,2}) where {T <: SymPyPythonCall.Sym} = upper_triangular(M) || lower_triangular(M)
 
 # ## This is likely not the best way as it is a bit fidgety due
 # ## to the call to rref.
-# function full_rank(M::Array{T,2}) where {T <: SymPyCall.Sym}
+# function full_rank(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
 #     m,n = size(M)
 #     m <= n || return full_rank(transpose(M))
 
 
-#     rr, p = SymPyCall.rref(M)
+#     rr, p = SymPyPythonCall.rref(M)
 #     lr = rr[end, :] # is this zero?
 #     no_nothing = 0
 #     no_nonzero = 0
 #     for val in lr
-#         a = SymPyCall.ask(nonzero(val))
+#         a = SymPyPythonCall.ask(nonzero(val))
 #         if a == nothing
 #             no_nothing += 1
 #         end
@@ -312,26 +312,26 @@ ask(x::Nothing, args...) = x
 # end
 
 
-# function square(M::Array{T,2}) where {T <: SymPyCall.Sym}
-#     m,n = SymPyCall.size(M)
+# function square(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
+#     m,n = SymPyPythonCall.size(M)
 #     m == n
 # end
 
 
-# function real_elements(M::Array{T,2}) where {T <: SymPyCall.Sym}
+# function real_elements(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
 #     vals = real.(M)
 #     for val in vals
-#         a = SymPyCall.ask(real(val))
+#         a = SymPyPythonCall.ask(real(val))
 #         (a == nothing || a == false) && return false
 #     end
 #     return true
 # end
 
 
-# function complex_elements(M::Array{T,2}) where {T <: SymPyCall.Sym}
+# function complex_elements(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
 #     vals = real.(M)
 #     for val in vals
-#         a = SymPyCall.ask(SymPyCall.sympy."Q".complex(val))
+#         a = SymPyPythonCall.ask(SymPyPythonCall.sympy."Q".complex(val))
 #         (a == nothing || a == false) && return false
 #     end
 #     return true
@@ -339,10 +339,10 @@ ask(x::Nothing, args...) = x
 # end
 
 
-# function integer_elements(M::Array{T,2}) where {T <: SymPyCall.Sym}
+# function integer_elements(M::Array{T,2}) where {T <: SymPyPythonCall.Sym}
 #     vals = real.(M)
 #     for val in vals
-#         a = SymPyCall.ask(integer(val))
+#         a = SymPyPythonCall.ask(integer(val))
 #         (a == nothing || a == false) && return false
 #     end
 #     return true

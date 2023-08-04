@@ -1,6 +1,6 @@
 using Test
-using SymPyCall
-import SymPyCall.PythonCall: PyException
+using SymPyPythonCall
+import SymPyPythonCall.PythonCall: PyException
 
 using SpecialFunctions
 using LinearAlgebra
@@ -8,10 +8,10 @@ using Base.MathConstants
 
 import PythonCall: Py
 
-SymPy = SymPyCall
-func = SymPyCall.Introspection.func
-args = SymPyCall.Introspection.args
-import SymPyCall: SymFunction
+SymPy = SymPyPythonCall
+func = SymPyPythonCall.Introspection.func
+args = SymPyPythonCall.Introspection.args
+import SymPyPythonCall: SymFunction
 sympify = sympy.sympify
 And = sympy.And
 Heaviside = sympy.Heaviside
@@ -836,7 +836,7 @@ end
     @test true^Sym(1)   == Sym(1) == Sym(1)^true
 
     ## issue with `pycall_hasproperty` and nothing values.
-    @test !SymPyCall.is_(:rational, Sym(2.5)) ## !SymPy.is_rational(Sym(2.5))
+    @test !SymPyPythonCall.is_(:rational, Sym(2.5)) ## !SymPy.is_rational(Sym(2.5))
 
     ## Issue #405 with ambigous methods
     @syms α

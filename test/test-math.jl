@@ -1,8 +1,8 @@
-using SymPyCall
+using SymPyPythonCall
 using Test
 using SpecialFunctions
 
-SymPy = SymPyCall
+SymPy = SymPyPythonCall
 
 @testset "Math" begin
     ρ = symbols("rho", positive=true)
