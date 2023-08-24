@@ -2,10 +2,10 @@ module SymPyPythonCallSymbolicsExt
 
 # from https://github.com/JuliaSymbolics/Symbolics.jl/pull/957/
 # by @jClugstor
-using SymPyPythonCall
+import SymPyPythonCall
 const sp = SymPyPythonCall.sympy.py
 const PythonCall = SymPyPythonCall.PythonCall
-import SymPyPythonCall.PythonCall: Py, pyisinstance, pyconvert
+import PythonCall: Py, pyisinstance, pyconvert
 
 import Symbolics
 import Symbolics: @variables
@@ -38,7 +38,7 @@ end
 
 function pyconvert_rule_sympy_add(::Type{Symbolics.Num}, x::Py)
     if !pyisinstance(x,sp.Add)
-       return PythonCall.pyconvert_unconverted()
+        return PythonCall.pyconvert_unconverted()
     end
     sum = reduce(+, PythonCall.pyconvert.(Symbolics.Num,x.args))
     return PythonCall.pyconvert_return(sum)
@@ -46,13 +46,12 @@ end
 
 function pyconvert_rule_sympy_equality(::Type{Symbolics.Equation}, x::Py)
     if !pyisinstance(x,sp.Equality)
-        return PythonCall.pyconvert_unconverted()
+         return PythonCall.pyconvert_unconverted()
     end
     rhs = pyconvert(Symbolics.Num,x.rhs)
     lhs = pyconvert(Symbolics.Num,x.lhs)
     return PythonCall.pyconvert_return(rhs ~ lhs)
 end
-
 function pyconvert_rule_sympy_derivative(::Type{Symbolics.Num}, x::Py)
     if !pyisinstance(x,sp.Derivative)
         return PythonCall.pyconvert_unconverted()
@@ -74,9 +73,9 @@ function pyconvert_rule_sympy_function(::Type{Symbolics.Num}, x::Py)
 end
 
 # added rules
-PythonCall.pyconvert_add_rule("sympy.core.power:Pow", Symbolics.Num, pyconvert_rule_sympy_pow)
-
 PythonCall.pyconvert_add_rule("sympy.core.symbol:Symbol", Symbolics.Num, pyconvert_rule_sympy_symbol)
+
+PythonCall.pyconvert_add_rule("sympy.core.power:Pow", Symbolics.Num, pyconvert_rule_sympy_pow)
 
 PythonCall.pyconvert_add_rule("sympy.core.mul:Mul", Symbolics.Num, pyconvert_rule_sympy_mul)
 
