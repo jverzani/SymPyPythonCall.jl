@@ -3,12 +3,12 @@ module SymPyPythonCallSymbolicsExt
 # from https://github.com/JuliaSymbolics/Symbolics.jl/pull/957/
 # by @jClugstor
 using SymPyPythonCall
+const sp = SymPyPythonCall.sympy.py
 const PythonCall = SymPyPythonCall.PythonCall
 import SymPyPythonCall.PythonCall: Py, pyisinstance, pyconvert
 
 import Symbolics
 import Symbolics: @variables
-const sp = SymPyPythonCall.sympy
 
 # rule functions
 function pyconvert_rule_sympy_symbol(::Type{Symbolics.Num}, x::Py)
