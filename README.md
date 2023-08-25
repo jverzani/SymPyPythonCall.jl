@@ -6,16 +6,19 @@
 [![Coverage](https://codecov.io/gh/jverzani/SymPyPythonCall.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/jverzani/SymPyPythonCall.jl)
 
 
-This is a start on what is needed to use `PythonCall` instead of `PyCall` for `SymPy.jl`.
-At the moment, the expectation is that *if* that change proves desirable, this would become `SymPy`.
+This package allows access to the [SymPy](https://www.sympy.org/en/index.html) Python library to `Julia` users through [PythonCall](https://github.com/cjdoris/PythonCall.jl).
 
-For now, there are some small design decisions from `SymPy` reflected here:
+(The more established [SymPy.jl](https://github.com/JuliaPy/SymPy.jl) uses [PyCall.jl](https://github.com/JuliaPy/PyCall.jl).)
 
-There would be a few deprecations:
+At the moment, the expectation is that *if* that change proves desirable, this would become `SymPy`, but for now this is a standalone package. This may be or interest for those having difficulty installing the underlying `sympy` library using `PyCall`.
+
+----
+
+Though nearly the same as `SymPy.jl`, for now, there are some small design decisions differing from `SymPy`:
 
 * `@vars` would be deprecated; use `@syms` only
 
-* `elements` for sets would be removed (convert to a `Set` by default)
+* `elements` for sets is deprecated (conversion to a `Set` is the newdefault)
 
 * `sympy.poly` *not* `sympy.Poly`
 
