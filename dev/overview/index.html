@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Basic overview · SymPyPythonCall</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">SymPyPythonCall</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">SymPyPythonCall</a></li><li><a class="tocitem" href="../docstrings/">Docstrings</a></li><li><a class="tocitem" href="../introduction/">A SymPyPythonCall introduction</a></li><li class="is-active"><a class="tocitem" href>Basic overview</a><ul class="internal"><li><a class="tocitem" href="#Using-other-SymPy-modules"><span>Using other SymPy modules</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Basic overview</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Basic overview</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jverzani/SymPyPythonCall.jl/blob/master/docs/src/overview.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Basic-overview"><a class="docs-heading-anchor" href="#Basic-overview">Basic overview</a><a id="Basic-overview-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-overview" title="Permalink"></a></h1><p>An interface between <code>Julia</code> and SymPy requires a few things. <code>PythonCall</code> can call into an underlying sympy library, for example</p><pre><code class="language-julia hljs">julia&gt; import PythonCall
+
+julia&gt; const _sympy_ = PythonCall.pynew()
+Python: NULL
+
+julia&gt; PythonCall.pycopy!(_sympy_, PythonCall.pyimport(&quot;sympy&quot;));</code></pre><p>The <code>_sympy_</code> object holds references to the underlying sympy library. For example, we can create a symbolic variable and call the <code>sin</code> function on it as follows:</p><pre><code class="language-julia hljs">julia&gt; x = _sympy_.symbols(&quot;x&quot;)
+Python: x
+
+julia&gt; _sympy_.sin(x)
+Python: sin(x)
+
+julia&gt; x.is_commutative
+Python: True
+
+julia&gt; typeof(x)
+PythonCall.Py</code></pre><p>The <code>PythonCall</code> package provides some basic operations for <code>Py</code> objects, such as basic math operations:</p><pre><code class="language-julia hljs">julia&gt; x + x
+Python: 2*x
+
+julia&gt; x * x
+Python: x**2
+
+julia&gt; x ^ x
+Python: x**x</code></pre><p><code>SymPyPythonCall</code> wraps the <code>Py</code> objects in its <code>Sym</code> class to provide a means to dispatch familiar <code>Julia</code> generics:</p><pre><code class="language-julia-repl hljs">julia&gt; using SymPyPythonCall
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; x = symbols(&quot;x&quot;)
+x
+
+julia&gt; simplify(2sin(x)*cos(x))
+sin(2*x)</code></pre><p>The package also provides methods for some sympy methods, such as <code>simplify</code> above. To make this work, there needs to be a means to take <code>Sym</code> objects to the <code>Py</code> counterparts and to take <code>Py</code> objects to <code>Sym</code>. As these conversions may be type dependent two operators (with the unicode equivalents <code>↓</code> and  <code>↑</code>) are used internally to allow the definition along these lines:</p><pre><code class="nohighlight hljs">simplify(x::Sym, args...; kwargs...) = ↑(sympy.simplify(↓(x), ↓(args)...; ↓(kwargs)...))</code></pre><p>The <code>expand_log</code> function is not wrapped as such, but can be called from the <code>sympy</code> object exported by <code>SymPyPythonCall</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x::real
+(x,)
+
+julia&gt; simplify(log(2x))
+log(2*x)
+
+julia&gt; sympy.expand_log(log(2x))
+log(x) + log(2)</code></pre><p>Methods of <code>sympy</code> are also called using the conversion operators above.</p><h2 id="Using-other-SymPy-modules"><a class="docs-heading-anchor" href="#Using-other-SymPy-modules">Using other SymPy modules</a><a id="Using-other-SymPy-modules-1"></a><a class="docs-heading-anchor-permalink" href="#Using-other-SymPy-modules" title="Permalink"></a></h2><p>We follow part of the <code>SymPy</code> docs to see how to access one of the numerous external modules of <code>sympy</code> beyond those exposed immediately by <code>SymPy</code>.</p><pre><code class="language-julia-repl hljs">julia&gt; import SymPyPythonCall.PythonCall: pyimport
+
+julia&gt; stats = pyimport(&quot;sympy.stats&quot;);</code></pre><p>The <code>stats</code> module holds several probability functions, similar to the <code>Distributions</code> package of <code>Julia</code>. This set of commands creates a normally distributed random variable, <code>X</code>, with symbolic parameters:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms μ, σ::positive;
+
+julia&gt; X = stats.Normal(&quot;X&quot;, μ, σ)
+Python: X
+
+julia&gt; stats.E(X)
+Python: μ
+
+julia&gt; stats.E(X^2)
+Python: μ**2 + σ**2
+
+julia&gt; stats.variance(X)
+Python: σ**2</code></pre><p>The one thing to note is the method calls return <code>Py</code> objects, as there is no intercepting of the method calls done the way there is for the <code>sympy</code> module. The <code>Sym</code> command can be used to wrap the output:</p><pre><code class="language-julia-repl hljs">julia&gt; stats.variance(X) |&gt; Sym
+σ^2</code></pre><p>The methods in the <code>stats</code> module are qualified with the module name above.</p><p>Next we see that statements like <span>$P(X &gt; \mu)$</span> can be answered specifying the inequality using <code>sympy.Gt</code> in the following:</p><pre><code class="language-julia-repl hljs">julia&gt; stats.P(sympy.Gt(X, μ))
+Python: 1/2</code></pre><p>A typical calculation for the normal distribution is the area one or more standard deviations larger than the mean:</p><pre><code class="language-julia-repl hljs">julia&gt; stats.P(sympy.Gt(X, μ + 1σ)) |&gt; Sym
+sqrt(2)*(-sqrt(2)*pi*exp(1/2)*erf(sqrt(2)/2)/2 + sqrt(2)*pi*exp(1/2)/2)*exp(-1/2)/(2*pi)</code></pre><p>The familiar  answer could be found by calling <code>N</code> or <code>evalf</code>.</p><p>We show one more distribution, the uniform over <span>$[a,b]$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms a::real b::real
+(a, b)
+
+julia&gt; U = stats.Uniform(&quot;U&quot;, a, b)
+Python: U
+
+julia&gt; stats.E(U) |&gt; simplify |&gt; println
+a/2 + b/2
+
+julia&gt; stats.variance(U) |&gt; Sym |&gt; simplify |&gt; factor |&gt; println
+(a - b)^2/12</code></pre><hr/><p>Not all outputs are so simple to incorporate. <code>PythonCall</code> does a good job of converting the arguments from <code>Julia</code> to Python, but the conversion from a Python (SymPy) structure back to a workable <code>Julia</code> structure can require some massaging.</p><p>The output of many integration problems is a piecewise function:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms n::integer x::real
+(n, x)
+
+julia&gt; u = integrate(x^n, x)
+Piecewise((x^(n + 1)/(n + 1), Ne(n, -1)), (log(x), True))</code></pre><p>The <code>u</code> object is of type <code>Sym</code>, but there are no methods for working with it. The <code>.args</code> call will break this into its argument, which again will by symbolic. We call the <code>.py</code> attribute of the <code>Sym</code> object to get an iterable:</p><pre><code class="language-julia-repl hljs">julia&gt; [Sym(t[1]) =&gt; Sym(t[0]) for t ∈ u.args.py]
+2-element Vector{Pair{Sym, Sym}}:
+ Ne(n, -1) =&gt; x^(n + 1)/(n + 1)
+      True =&gt; log(x)</code></pre><p>The python objects are iterated over, so 0-based indexing is used above. These pieces are then converted to <code>Sym</code> objects for familiarity.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../introduction/">« A SymPyPythonCall introduction</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.14 on <span class="colophon-date" title="Friday 25 August 2023 21:35">Friday 25 August 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
