@@ -46,14 +46,6 @@ function pyconvert_rule_sympy_add(::Type{Symbolics.Num}, x)
     return PythonCall.pyconvert_return(sum)
 end
 
-function pyconvert_rule_sympy_equality(::Type{Symbolics.Equation}, x)
-    if !pyisinstance(x,sp.Equality)
-         return PythonCall.pyconvert_unconverted()
-    end
-    rhs = pyconvert(Symbolics.Num,x.rhs)
-    lhs = pyconvert(Symbolics.Num,x.lhs)
-    return PythonCall.pyconvert_return(rhs ~ lhs)
-end
 function pyconvert_rule_sympy_derivative(::Type{Symbolics.Num}, x)
     if !pyisinstance(x,sp.Derivative)
         return PythonCall.pyconvert_unconverted()
@@ -76,26 +68,37 @@ function pyconvert_rule_sympy_function(::Type{Symbolics.Num}, x)
     return PythonCall.pyconvert_return(first(func)(args...))
 end
 
+function pyconvert_rule_sympy_equality(::Type{Symbolics.Equation}, x)
+    if !pyisinstance(x,sp.Equality)
+         return PythonCall.pyconvert_unconverted()
+    end
+    rhs = pyconvert(Symbolics.Num,x.rhs)
+    lhs = pyconvert(Symbolics.Num,x.lhs)
+    return PythonCall.pyconvert_return(rhs ~ lhs)
+end
+
 
 function __init__()
     # added rules
-    add_pyconvert_rule(f, cls) = PythonCall.pyconvert_add_rule(cls, Symbolics.Num, f)
-
+    # T = Symbolics.Num
     PythonCall.pyconvert_add_rule("sympy.core.symbol:Symbol", Symbolics.Num, pyconvert_rule_sympy_symbol)
 
-    PythonCall.pyconvert_add_rule("sympy.core.power:Pow", Symbolics.Num, pyconvert_rule_sympy_pow)
+    PythonCall.pyconvert_add_rule("sympy.core.power:Pow",     Symbolics.Num, pyconvert_rule_sympy_pow)
 
-    PythonCall.pyconvert_add_rule("sympy.core.mul:Mul", Symbolics.Num, pyconvert_rule_sympy_mul)
+    PythonCall.pyconvert_add_rule("sympy.core.mul:Mul",       Symbolics.Num, pyconvert_rule_sympy_mul)
 
-    PythonCall.pyconvert_add_rule("sympy.core.add:Add", Symbolics.Num, pyconvert_rule_sympy_add)
+    PythonCall.pyconvert_add_rule("sympy.core.add:Add",       Symbolics.Num, pyconvert_rule_sympy_add)
 
+    PythonCall.pyconvert_add_rule("sympy.core.function:Derivative", Symbolics.Num, pyconvert_rule_sympy_derivative)
+
+    PythonCall.pyconvert_add_rule("sympy.core.function:Function",   Symbolics.Num, pyconvert_rule_sympy_function)
+
+    # T = Symbolics.Equation
     PythonCall.pyconvert_add_rule("sympy.core.relational:Equality", Symbolics.Equation, pyconvert_rule_sympy_equality)
 
-    PythonCall.pyconvert_add_rule("sympy.core.function:Derivative",Symbolics.Num, pyconvert_rule_sympy_derivative)
-
-    PythonCall.pyconvert_add_rule("sympy.core.function:Function",Symbolics.Num, pyconvert_rule_sympy_function)
-
     # core numbers
+    add_pyconvert_rule(f, cls) = PythonCall.pyconvert_add_rule(cls, Symbolics.Num, f)
+
     add_pyconvert_rule("sympy.core.numbers:Pi") do T::Type{Symbolics.Num}, x
         PythonCall.pyconvert_return(Symbolics.Num(pi))
     end
