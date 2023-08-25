@@ -68,8 +68,10 @@ function pyconvert_rule_sympy_function(::Type{Symbolics.Num}, x)
     if !pyisinstance(x,sp.Function)
         return PythonCall.pyconvert_unconverted()
     end
-    name = pyconvert(Symbol,x.name)
-    args = pyconvert.(Symbolics.Num,x.args)
+    nm = PythonCall.pygetattr(x, "func", nothing)
+    isnothing(nm) && return PythonCall.pyconvert_unconverted() # XXX
+    name = pyconvert(Symbol, nm)
+    args = pyconvert.(Symbolics.Num, x.args)
     func = @variables $name(..)
     return PythonCall.pyconvert_return(first(func)(args...))
 end
@@ -77,6 +79,8 @@ end
 
 function __init__()
     # added rules
+    add_pyconvert_rule(f, cls) = PythonCall.pyconvert_add_rule(cls, Symbolics.Num, f)
+
     PythonCall.pyconvert_add_rule("sympy.core.symbol:Symbol", Symbolics.Num, pyconvert_rule_sympy_symbol)
 
     PythonCall.pyconvert_add_rule("sympy.core.power:Pow", Symbolics.Num, pyconvert_rule_sympy_pow)
@@ -90,7 +94,25 @@ function __init__()
     PythonCall.pyconvert_add_rule("sympy.core.function:Derivative",Symbolics.Num, pyconvert_rule_sympy_derivative)
 
     PythonCall.pyconvert_add_rule("sympy.core.function:Function",Symbolics.Num, pyconvert_rule_sympy_function)
-end
 
+    # core numbers
+    add_pyconvert_rule("sympy.core.numbers:Pi") do T::Type{Symbolics.Num}, x
+        PythonCall.pyconvert_return(Symbolics.Num(pi))
+    end
+    add_pyconvert_rule("sympy.core.numbers:Exp1") do T::Type{Symbolics.Num}, x
+        PythonCall.pyconvert_return(Symbolics.Num(ℯ))
+    end
+    add_pyconvert_rule("sympy.core.numbers:Infinity") do T::Type{Symbolics.Num}, x
+        PythonCall.pyconvert_return(Symbolics.Num(Inf))
+    end
+    #= complex numbers and Num needs some workaround
+    add_pyconvert_rule("sympy.core.numbers:ImaginaryUnit") do T::Type{Symbolics.Num}, x
+        PythonCall.pyconvert_return(Symbolics.Num(im))
+    end
+    add_pyconvert_rule("sympy.core.numbers:ComplexInfinity") do T::Type{Symbolics.Num}, x
+        PythonCall.pyconvert_return(Symbolics.Num(Inf)) # errors: Complex(Inf,Inf)))
+    end
+    =#
+end
 
 end
