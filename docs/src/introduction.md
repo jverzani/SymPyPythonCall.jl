@@ -123,13 +123,13 @@ We jump ahead for a second to illustrate, but here we see that `solve` will resp
 
 ```jldoctest introduction
 julia> solve(x^2 + 1)   # ±i are not real
-Any[]
+Sym[]
 
 ```
 
 ```jldoctest introduction
 julia> solve(y1 + 1)    # -1 is not positive
-Any[]
+Sym[]
 
 ```
 
@@ -140,7 +140,7 @@ julia> @syms u1::positive u2::positive
 (u1, u2)
 
 julia> solve(u1 + u2)  # empty, though solving u1 - u2 is not.
-Any[]
+Sym[]
 ```
 
 Additionally you can rename arguments using pair notation:
@@ -173,8 +173,8 @@ function, the second to `SymPy`'s:
 ```jldoctest introduction
 julia> [asin(1), asin(Sym(1))]
 2-element Vector{Sym}:
- 1.57079632679490
-             pi/2
+ 1.5707963267948966
+               pi/2
 
 ```
 
