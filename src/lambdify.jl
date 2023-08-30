@@ -45,7 +45,7 @@ __HEAVISIDE__ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2]
 fn_map = Dict(
     "Add" => :+,
     "Sub" => :-,
-    "Mul" => :*, # :(SymPy.__PROD__)
+    "Mul" => :((as...)->prod(as)), #:*, # :(SymPy.__PROD__)
     "Div" => :/,
     "Pow" => :^,
     "re"  => :real,
@@ -77,12 +77,9 @@ map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
 Base.convert(::Type{Expr}, x::SymbolicObject) = walk_expression(x)
 
 function walk_expression(ex; values=Dict(), fns=Dict())
-
     fns_map = merge(fn_map, fns)
     vals_map = merge(val_map, values)
-
-    fn = Introspection.funcname(ex)
-
+    fn = Introspection.funcname(first(ex))
     # special case `F(t) = ...` output from ODE
     # this may be removed if it proves a bad idea....
     if fn == "Equality" && Bool(lhs(ex).is_Function)
@@ -107,6 +104,8 @@ function walk_expression(ex; values=Dict(), fns=Dict())
         return walk_expression.(Introspection.args(ex), values=values, fns=fns)
     elseif fn == "Indexed"
         return Expr(:ref, [walk_expression(a, values=values, fns=fns) for a in Introspection.args(ex)]...)
+    elseif fn == "Order"
+        return 0
     elseif haskey(vals_map, fn)
         return vals_map[fn]
     end
@@ -212,7 +211,6 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
               fns=Dict(), values=Dict(),
               use_julia_code=false,
               invoke_latest=true)
-
     body = convert_expr(ex, fns=fns, values=values, use_julia_code=use_julia_code)
     ex = expr_to_function(body, vars)
     if invoke_latest

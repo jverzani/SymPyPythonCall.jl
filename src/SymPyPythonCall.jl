@@ -90,10 +90,6 @@ function __init__()
     PythonCall.pycopy!(__FALSE__, pyconvert(Py, false))
     PythonCall.pycopy!(__𝑄__, __sympy__.Q)
 
-
 end
-
-
-
 
 end

@@ -1,36 +1,48 @@
-## XXX We should be hooking to the pyconvert methods XXX
-## we need Py -> Sym (asSymbolic)
-## we need Sym -> Py unSym
-asSymbolic(x::Sym) = x
-function asSymbolic(x::Py)
-
-    cls = x.__class__
-
-    if pyconvert(Bool, cls == pybuiltins.list)
-        return asSymbolic.(x)
-    elseif pyconvert(Bool, cls == pybuiltins.dict)
-        return Dict(asSymbolic(k) => asSymbolic(v) for (k,v) ∈ pyconvert(PyDict, x))
-    elseif pyconvert(Bool, cls == pybuiltins.tuple)
-        return Tuple(asSymbolic(xᵢ) for xᵢ ∈ x)
-    elseif pyconvert(Bool, cls == pybuiltins.set)
-        return Set(asSymbolic(xᵢ) for xᵢ ∈ x)
-    # elseif pyconvert(Bool, cls == pybuiltins.list)
-    end
+# we have this picture for calling SymPy methods
+# Julia ⋯⋯⋯⋯ >  Julia
+#  |                ^
+#  |                |
+#  | (unSym, Py, ↓) | (asSymbolic, ↑)
+#  |                |
+#  v      (SymPy)   |
+# Python  ------> Python
 
 
-    Bool(pygetattr(x, "is_FiniteSet", false)) && return Set(asSymbolic(xᵢ) for xᵢ ∈ x)
+"""
+    asSymbolic(x)
 
-    if Bool(pygetattr(x, "is_Matrix", false))
-        sz = pyconvert(Tuple, x.shape)
-        !isa(sz[1], Real) && return Sym(x) # MatrixSymbol special case
-        return [asSymbolic(x.__getitem__((i-1, j-1))) for i ∈ 1:sz[1], j ∈ 1:sz[2]]
-    end
-    Sym(x)
-end
-asSymbolic(x::String) = x
+Convert `Python` object into symbolic `Julia` object. Aliased to `↑`.
+"""
 asSymbolic(x) = Sym(pyconvert(Py, x))
-↑(args...; kwargs...) = asSymbolic(args...; kwargs...)
+asSymbolic(x::Sym) = x
+asSymbolic(x::String) = Sym(x)
 
+PyTypeName(x) = Val(Symbol(PythonCall.pyconvert_typename(pytype(x))))
+asSymbolic(x::Py) = asSymbolic(PyTypeName(x), x) # special case based on typename
+
+asSymbolic(::Val{T}, x::Py) where {T} = Sym(x) # fallback
+
+asSymbolic(::Val{Symbol("builtins:list")}, x::Py) = isempty(x) ? Sym[] : [asSymbolic(xᵢ) for xᵢ ∈ x] # XXX are lists Tuples or vectors???
+asSymbolic(::Val{Symbol("builtins:tuple")}, x::Py) = Tuple(asSymbolic(xᵢ) for xᵢ ∈ x)
+asSymbolic(::Val{Symbol("builtins:dict")}, x::Py) = Dict(asSymbolic(k) => asSymbolic(v) for (k,v) ∈ pyconvert(PyDict, x))
+asSymbolic(::Val{Symbol("builtins:set")}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
+asSymbolic(::Val{Symbol("sympy.sets.sets:FiniteSet")}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
+asSymbolic(::Val{Symbol("sympy.core.containers:Tuple")}, x::Py) = Tuple(asSymbolic(xᵢ) for xᵢ ∈ x)
+
+function _as_symbolic_dense_matrix(x)
+    sz = pyconvert(Tuple, x.shape)
+    return [asSymbolic(x.__getitem__((i-1, j-1))) for i ∈ 1:sz[1], j ∈ 1:sz[2]]
+end
+asSymbolic(::Val{Symbol("sympy.matrices.dense:MutableDenseMatrix")}, x::Py) = _as_symbolic_dense_matrix(x)
+asSymbolic(::Val{Symbol("sympy.matrices.dense:ImmutableDenseMatrix")}, x::Py) = _as_symbolic_dense_matrix(x)
+
+function _as_symbolic_symbolic_matrix(x)
+    sz = pyconvert(Tuple, x.shape)
+    !isa(sz[1], Real) && return Sym(x) # MatrixSymbol special case
+    return [asSymbolic(x.__getitem__((i-1, j-1))) for i ∈ 1:sz[1], j ∈ 1:sz[2]]
+end
+asSymbolic(::Val{Symbol("sympy.matrices.expressions.matexpr:MatrixSymbol")}, x::Py) = _as_symbolic_symbolic_matrix(x)
+asSymbolic(::Val{Symbol("sympy.matrices.expressions.inverse:Inverse")}, x::Py) = _as_symbolic_symbolic_matrix(x)
 
 # used to pass arguments down into calls
 unSym(x) = x
@@ -42,7 +54,7 @@ unSym(x::Dict) = convert(PyDict,Dict(unSym(k) => unSym(v) for (k,v) ∈ x)) # Ab
 unSym(x::Set) = sympy.py.Set(unSym(collect(x)))
 unSym(x::Irrational{:π}) = unSym(sympy.pi)
 unSymkwargs(kw) = (k=>unSym(v) for (k,v) ∈ kw)
-↓(args...; kwargs...) = unSym(args...; kwargs...)
+
 
 #PythonCall.Py(x::Sym) = ↓(x)
 PythonCall.Py(x::NTuple{N,T}) where {N, T <: SymbolicObject} = ↓(x)
@@ -50,6 +62,9 @@ PythonCall.Py(x::Vector{T}) where {T <: SymbolicObject} = unSym.(x)
 PythonCall.Py(x::Matrix{T}) where {T <: SymbolicObject} = unSym.(x)
 PythonCall.Py(x::Set{T}) where {T <: SymbolicObject} = unSym(x)
 
+# use ↑, ↓ shortcuts
+↑(args...; kwargs...) = asSymbolic(args...; kwargs...)
+↓(args...; kwargs...) = unSym(args...; kwargs...)
 
 
 ## --------------------------------------------------
@@ -98,7 +113,7 @@ generic_methods = (
     (:sympy, :Max, :Base, :max),
     (:sympy, :Abs, :Base, :abs),
     (:sympy, :Min, :Base, :min),
-
+    #
     (:sympy, :re, :Base, :real),
     (:sympy, :im, :Base, :imag),
 
@@ -116,28 +131,29 @@ generic_methods = (
     # diff
     (:sympy, :diff, :CommonEq, :diff),
 
+    # collect
     (:sympy, :collect, :Base, :collect),
 
     # SpecialFunctions
-    (:sympy, :airyai , :SpecialFunctions, :airyai),
+    (:sympy, :airyai ,      :SpecialFunctions, :airyai),
     (:sympy, :airyaiprime , :SpecialFunctions, :airyaiprime),
-    (:sympy, :airybi , :SpecialFunctions, :airybi),
-    (:sympy, :besseli , :SpecialFunctions, :besseli),
-    (:sympy, :besselj , :SpecialFunctions, :besselj),
-    (:sympy, :besselk , :SpecialFunctions, :besselk),
-    (:sympy, :bessely , :SpecialFunctions, :bessely),
-    (:sympy, :beta , :SpecialFunctions, :beta),
-    (:sympy, :erf , :SpecialFunctions, :erf),
-    (:sympy, :erfc , :SpecialFunctions, :erfc),
-    (:sympy, :erfi , :SpecialFunctions, :erfi),
-    (:sympy, :erfinv , :SpecialFunctions, :erfinv),
-    (:sympy, :erfcinv , :SpecialFunctions, :erfcinv),
-    (:sympy, :gamma , :SpecialFunctions, :gamma),
-    (:sympy, :digamma , :SpecialFunctions, :digamma),
-    (:sympy, :polygamma , :SpecialFunctions, :polygamma),
-    (:sympy, :hankel1, :SpecialFunctions, :hankelh1),
-    (:sympy, :hankel2, :SpecialFunctions, :hankelh2),
-    (:sympy, :zeta , :SpecialFunctions, :zeta),
+    (:sympy, :airybi ,      :SpecialFunctions, :airybi),
+    (:sympy, :besseli ,     :SpecialFunctions, :besseli),
+    (:sympy, :besselj ,     :SpecialFunctions, :besselj),
+    (:sympy, :besselk ,     :SpecialFunctions, :besselk),
+    (:sympy, :bessely ,     :SpecialFunctions, :bessely),
+    (:sympy, :beta ,        :SpecialFunctions, :beta),
+    (:sympy, :erf ,         :SpecialFunctions, :erf),
+    (:sympy, :erfc ,        :SpecialFunctions, :erfc),
+    (:sympy, :erfi ,        :SpecialFunctions, :erfi),
+    (:sympy, :erfinv ,      :SpecialFunctions, :erfinv),
+    (:sympy, :erfcinv ,     :SpecialFunctions, :erfcinv),
+    (:sympy, :gamma ,       :SpecialFunctions, :gamma),
+    (:sympy, :digamma ,     :SpecialFunctions, :digamma),
+    (:sympy, :polygamma ,   :SpecialFunctions, :polygamma),
+    (:sympy, :hankel1,      :SpecialFunctions, :hankelh1),
+    (:sympy, :hankel2,      :SpecialFunctions, :hankelh2),
+    (:sympy, :zeta ,        :SpecialFunctions, :zeta),
 )
 
 # comment, Py(...) speeds things up a bit.
@@ -152,27 +168,30 @@ end
 # pmod, pmeth, meth
 #const
 new_exported_methods = (
-    (:sympy, :simplify, :simplify),
+    (:sympy, :simplify,    :simplify),
     (:sympy, :expand_trig, :expand_trig),
-    (:sympy, :expand, :expand),
-    (:sympy, :together, :together),
-    (:sympy, :apart, :apart),
-    (:sympy, :factor, :factor),
-    (:sympy, :cancel, :cancel),
-    (:sympy, :degree, :degree),
-    (:sympy, :integrate, :integrate),
-    (:sympy, :real_roots, :real_roots),
-    (:sympy, :roots, :roots),
-    (:sympy, :nroots, :nroots),
-    (:sympy, :dsolve, :dsolve),
-    (:sympy, :nsolve, :nsolve),
-    (:sympy, :linsolve, :linsolve),
+    (:sympy, :expand,      :expand),
+    (:sympy, :together,    :together),
+    (:sympy, :apart,       :apart),
+    (:sympy, :factor,      :factor),
+    (:sympy, :cancel,      :cancel),
+    #
+    (:sympy, :degree,      :degree),
+    #
+    (:sympy, :integrate,   :integrate),
+    #
+    (:sympy, :real_roots,  :real_roots),
+    (:sympy, :roots,       :roots),
+    (:sympy, :nroots,      :nroots),
+    (:sympy, :dsolve,      :dsolve),
+    (:sympy, :nsolve,      :nsolve),
+    (:sympy, :linsolve,    :linsolve),
     (:sympy, :nonlinsolve, :nonlinsolve),
-    (:sympy, :solveset, :solveset),
-
-    (:sympy, :series, :series),
-    (:sympy, :summation, :summation),
-    (:sympy, :hessian, :hessian),
+    (:sympy, :solveset,    :solveset),
+    #
+    (:sympy, :series,      :series),
+    (:sympy, :summation,   :summation),
+    (:sympy, :hessian,     :hessian),
 )
 
 for (pmod, pmeth, jmeth) ∈ new_exported_methods

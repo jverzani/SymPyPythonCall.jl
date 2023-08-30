@@ -17,6 +17,7 @@ end
 # allow dot access to underlying methods, properties
 function Base.getproperty(x::Sym, a::Symbol)
 
+
     a == :py && return getfield(x,a)
 
     py = Py(x)
@@ -24,6 +25,7 @@ function Base.getproperty(x::Sym, a::Symbol)
     val === nothing && return nothing
 
     # hacky, but seems necessary for sympy.Poly, sympy.Curve, and others
+    contains(string(pytype(val)), "ManagedProperties") && @info "Managed Properties is deprecated in Sympy; can you report:", py, a
     contains(string(pytype(val)), "ManagedProperties") && return (args...;kwargs...) -> ↑(val(unSym.(args)...; unSymkwargs(kwargs)...))
 
     meth = pygetattr(val, "__call__", nothing)
@@ -41,7 +43,8 @@ Sym(x::Symbol) = Sym(string(x))
 Sym(x::Sym) = x
 Sym(x::Complex{Bool}) = 1*real(x) + 1*imag(x)*IM
 Sym(x::Complex) = Sym(real(x)) + Sym(imag(x))*IM
-Sym(x::Number) = sympy.sympify(x) #Sym(sympy.pyconvert(Py, x))
+Sym(x::Integer) = sympy.core.numbers.Integer(x)
+Sym(x::Number) = Sym(pyconvert(Py, x)) # sympy.sympify(x) #Sym(sympy.pyconvert(Py, x))
 Sym(x::PyArray) = Sym.(x)
 Sym(x::PyDict) = Dict(Sym(k) => Sym(v) for (k,v) ∈ x)
 Sym(x::PyIterable) = (Sym(u) for u ∈ x)
@@ -58,6 +61,7 @@ Sym(x::Irrational{:e}) = sympy.E
 struct SymbolicCallable
     val
 end
+Base.show(io::IO, λ::SymbolicCallable) = print(io, "Callable SymPy method")
 function (v::SymbolicCallable)(args...; kwargs...)
     ↑(v.val(unSym.(args)...; unSymkwargs(kwargs)...))
 end

@@ -97,7 +97,7 @@ function __init__()
     PythonCall.pyconvert_add_rule("sympy.core.relational:Equality", Symbolics.Equation, pyconvert_rule_sympy_equality)
 
     # core numbers
-    add_pyconvert_rule(f, cls) = PythonCall.pyconvert_add_rule(cls, Symbolics.Num, f)
+    add_pyconvert_rule(f, cls, T=Symbolics.Num) = PythonCall.pyconvert_add_rule(cls, T, f)
 
     add_pyconvert_rule("sympy.core.numbers:Pi") do T::Type{Symbolics.Num}, x
         PythonCall.pyconvert_return(Symbolics.Num(pi))
@@ -108,14 +108,13 @@ function __init__()
     add_pyconvert_rule("sympy.core.numbers:Infinity") do T::Type{Symbolics.Num}, x
         PythonCall.pyconvert_return(Symbolics.Num(Inf))
     end
-    #= complex numbers and Num needs some workaround
-    add_pyconvert_rule("sympy.core.numbers:ImaginaryUnit") do T::Type{Symbolics.Num}, x
-        PythonCall.pyconvert_return(Symbolics.Num(im))
+    # Complex{Num}
+    add_pyconvert_rule("sympy.core.numbers:ImaginaryUnit", Complex{Symbolics.Num}) do T::Type{Complex{Symbolics.Num}}, x
+        PythonCall.pyconvert_return(Complex(Symbolics.Num(0), Symbolics.Num{1}))
     end
-    add_pyconvert_rule("sympy.core.numbers:ComplexInfinity") do T::Type{Symbolics.Num}, x
-        PythonCall.pyconvert_return(Symbolics.Num(Inf)) # errors: Complex(Inf,Inf)))
+    add_pyconvert_rule("sympy.core.numbers:ComplexInfinity", Complex{Symbolics.Num}) do T::Type{Complex{Symbolics.Num}}, x
+        PythonCall.pyconvert_return(Complex(Symbolics.Num(0), Symbolics.Num(Inf)) )
     end
-    =#
 end
 
 end
