@@ -2,17 +2,21 @@
 
 !!! note "SymPyPythonCall"
 
-    This is a test of what works in `SymPyPythonCall`.
-	`SymPyPythonCall` is just a temporary package for now, with the expectation that it may become `SymPy`.
-	There would be a few deprecations:
-	* `@vars` would be deprecated; use `@syms` only
+    `SymPyPythonCall.jl` is like the `SymPy.jl` package in that it allows access to the underlying `SymPy`
+	library for `Python` from within `Julia`.
+
+	Whereas `SymPy.jl` uses the `PyCall` package, `SymPyPythonCall` uses the `PythonCall` package to provide
+	the bridge between `Julia` and `Python`.
+
+	Though the two packages work similarly, there are a few differences:
+
+	* `@vars` of `SymPy` is not provided; use the more powerful `@syms` macro only
 	* `Base.show` isn't *currently* using pretty printing
-	* `elements` for sets would be removed (convert to a `Set` by default)
-	* Would `Q` be exported? (only the slant italic Q is currently)
-	* What to do with matrices? E.g. `A\b` is failing now
+	* Sets are handled differently, with finite sets converted to `Julia` `Set`s.
+	* Currently `Q` is not exported. (only the slant italic Q is currently)
+	* Matrix support may not be complete.
 	* `sympy.poly` *not* `sympy.Poly`
-    * would we export `CommonEq`?
-	* `limit(ex, x, c)` deprecated; use `limit(ex, x=>c)` or `sympy.limit`
+	* The form `limit(ex, x, c)` is not provided; use `limit(ex, x=>c)` or `sympy.limit`
     * no new special functions exported, just the ones in SpecialFunctions.jl
 
 This document provides an introduction to using `SymPy` within `Julia`.
@@ -119,13 +123,13 @@ We jump ahead for a second to illustrate, but here we see that `solve` will resp
 
 ```jldoctest introduction
 julia> solve(x^2 + 1)   # ±i are not real
-Any[]
+Sym[]
 
 ```
 
 ```jldoctest introduction
 julia> solve(y1 + 1)    # -1 is not positive
-Any[]
+Sym[]
 
 ```
 
@@ -136,7 +140,7 @@ julia> @syms u1::positive u2::positive
 (u1, u2)
 
 julia> solve(u1 + u2)  # empty, though solving u1 - u2 is not.
-Any[]
+Sym[]
 ```
 
 Additionally you can rename arguments using pair notation:
@@ -169,8 +173,8 @@ function, the second to `SymPy`'s:
 ```jldoctest introduction
 julia> [asin(1), asin(Sym(1))]
 2-element Vector{Sym}:
- 1.57079632679490
-             pi/2
+ 1.5707963267948966
+               pi/2
 
 ```
 
@@ -218,9 +222,12 @@ z + 1 + pi
 
 !!! note
 
-    The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. `SymPyPythonCall` imports many generic functions from the underlying `sympy` module and specializes them on a symbolic first argument.
+    The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments...)` whereas a more "`Julia`n" function call is `method(objects, arguments...)`, as `Julia` offers multiple dispatch of methods. `SymPyPythonCall` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. `SymPyPythonCall` imports many generic functions from the underlying `sympy` module and specializes them on a symbolic first argument.
 
-    For `subs`, the simple substitution `ex.object(x,a)` is similar to simple function evaluation, so `Julia`'s call notation will work. To specify the pairing off of `x` and `a`, the `=>`  pairs notation is used.
+!!! note
+    The SymPy documentation for many functions can be read from the terminal using `Base.Docs.getdoc(ex)`, as in `Base.Docs.getdoc(sin(x))`.
+
+For `subs`, the simple substitution `ex.object(x,a)` is similar to simple function evaluation, so `Julia`'s call notation will work. To specify the pairing off of `x` and `a`, the `=>`  pairs notation is used.
 
 This calling style will be equivalent to the last:
 
@@ -610,7 +617,7 @@ julia> q.coeffs()
 
 !!! note
 
-    This is `sympy` not `SymPyPythonCall`. Using `sympy.Poly` is not supported. The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPyCa;;` is loaded.
+    This is `sympy` not `SymPyPythonCall` qualifying the method call. Using `sympy.Poly` is not supported. The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPyCall` is loaded.
 
 
 ## Polynomial roots: solve, real_roots, polyroots, nroots
@@ -840,6 +847,31 @@ julia> solve(p)
 1-element Vector{Dict{Sym, Sym}}:
  Dict(a => (-b*x - c)/x^2)
 ```
+
+The output of `solveset` in Python is always a set, which may be finite or not. Finite sets are converted to `Set`s in `Julia`. Infinite sets have no natural counterpart and are not realized. Rather, they can be queried, as with `contains(haystack, needle)`. For example:
+
+```jldoctest introduction
+julia> u = solveset(sin(x) ≧ 0)  # [\geqq] or with u  = solveset(Ge(sin(x), 0))
+ConditionSet(x, sin(x) >= 0, Complexes)
+
+julia> contains(u, PI/2)
+true
+
+julia> contains(u, 3PI/2)
+false
+```
+
+Infinite sets can have unions and intersections taken, but the SymPy methods must be called:
+
+```jldoctest introduction
+julia> v = solveset(cos(x) ≧ 0)
+ConditionSet(x, cos(x) >= 0, Complexes)
+
+julia> contains.((u, v, u.intersect(v), u.union(v)), 3PI/4)
+(true, false, false, true)
+```
+
+---
 
 Systems of equations can be solved as well. We specify them within a
 vector of expressions, `[ex1, ex2, ..., exn]` where a found solution

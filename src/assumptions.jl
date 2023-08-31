@@ -52,7 +52,7 @@ ask(x::Nothing, args...) = x
 # ## for now, we can combine terms logically with And, Or, Not...
 # ## these are in logic module
 
-
+# XXX This is from SymPy. Do we want this in SymPyPythonCall?
 
 # ## We make a module Q to hold the assumptions
 # ## this follows this page http://docs.sympy.org/0.7.5/_modules/sympy/assumptions/ask.html
