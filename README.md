@@ -9,7 +9,7 @@ This package allows access to the [SymPy](https://www.sympy.org/en/index.html) P
 
 (The more established [SymPy.jl](https://github.com/JuliaPy/SymPy.jl) uses [PyCall.jl](https://github.com/JuliaPy/PyCall.jl).)
 
-At the moment, the expectation is that *if* that change proves desirable, this would become `SymPy`, but for now this is a standalone package. This may be or interest for those having difficulty installing the underlying `sympy` library using `PyCall`.
+At the moment, the expectation is that *if* that change proves desirable, this would become `SymPy`, but for now this is a standalone package. This may be of interest for those having difficulty installing the underlying `sympy` library using `PyCall`.
 
 ----
 
@@ -34,8 +34,8 @@ Though nearly the same as `SymPy.jl`, for now, there are some small design decis
 
 ## Installing `sympy`,
 
-The `sympy` package for Python should install with the package through `PythonCall` and `CondaPkg`. If not,
-to install `sympy` in `PythonCall` isn't hard; below shows how it may be done.
+The Python `sympy` package should install with the package through `PythonCall` and `CondaPkg`. If not,
+installing `sympy` in `PythonCall` isn't hard; shown below how it may be done.
 
 ```
 using PythonCall
