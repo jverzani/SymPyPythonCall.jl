@@ -15,17 +15,17 @@ At the moment, the expectation is that *if* that change proves desirable, this w
 
 Though nearly the same as `SymPy.jl`, for now, there are some small design decisions differing from `SymPy`:
 
-* `@vars` would be deprecated; use `@syms` only
+* `@vars` of SymPy is not provided; use the more powerful `@syms` macro only.
 
-* `elements` for sets is deprecated (conversion to a `Set` is the newdefault)
+* `elements` for sets is deprecated (conversion to a `Set` is the new default).
 
 * `sympy.poly` *not* `sympy.Poly`
 
-* `limit(ex, x, c)` deprecated; use `limit(ex, x=>c)` or `sympy.limit`
+* `limit(ex, x, c)` deprecated; use `limit(ex, x=>c)` or `sympy.limit`.
 
-* `Base.show` isn't *currently* using pretty printing
+* `Base.show` isn't *currently* using pretty printing.
 
-* Would `Q` be ported? (Use `\itQ` for now)
+* Would `Q` be ported? (Use `\itQ` for now.)
 
 * What to do with matrices? Using `Matrix{Sym}` with no `SymMatrix` type expected. Views seem off, so for now a copy is made.
 
