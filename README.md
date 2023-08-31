@@ -9,23 +9,23 @@ This package allows access to the [SymPy](https://www.sympy.org/en/index.html) P
 
 (The more established [SymPy.jl](https://github.com/JuliaPy/SymPy.jl) uses [PyCall.jl](https://github.com/JuliaPy/PyCall.jl).)
 
-At the moment, the expectation is that *if* that change proves desirable, this would become `SymPy`, but for now this is a standalone package. This may be or interest for those having difficulty installing the underlying `sympy` library using `PyCall`.
+At the moment, the expectation is that *if* that change proves desirable, this would become `SymPy`, but for now this is a standalone package. This may be of interest for those having difficulty installing the underlying `sympy` library using `PyCall`.
 
 ----
 
 Though nearly the same as `SymPy.jl`, for now, there are some small design decisions differing from `SymPy`:
 
-* `@vars` would be deprecated; use `@syms` only
+* `@vars` of SymPy is not provided; use the more powerful `@syms` macro only.
 
-* `elements` for sets is deprecated (conversion to a `Set` is the newdefault)
+* `elements` for sets is deprecated (conversion to a `Set` is the new default).
 
 * `sympy.poly` *not* `sympy.Poly`
 
-* `limit(ex, x, c)` deprecated; use `limit(ex, x=>c)` or `sympy.limit`
+* `limit(ex, x, c)` deprecated; use `limit(ex, x=>c)` or `sympy.limit`.
 
-* `Base.show` isn't *currently* using pretty printing
+* `Base.show` isn't *currently* using pretty printing.
 
-* Would `Q` be ported? (Use `\itQ` for now)
+* Would `Q` be ported? (Use `\itQ` for now.)
 
 * What to do with matrices? Using `Matrix{Sym}` with no `SymMatrix` type expected. Views seem off, so for now a copy is made.
 
@@ -34,8 +34,8 @@ Though nearly the same as `SymPy.jl`, for now, there are some small design decis
 
 ## Installing `sympy`,
 
-The `sympy` package for Python should install with the package through `PythonCall` and `CondaPkg`. If not,
-to install `sympy` in `PythonCall` isn't hard; below shows how it may be done.
+The Python `sympy` package should install with the package through `PythonCall` and `CondaPkg`. If not,
+installing `sympy` in `PythonCall` isn't hard; shown below how it may be done.
 
 ```
 using PythonCall
