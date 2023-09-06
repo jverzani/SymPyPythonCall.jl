@@ -113,6 +113,9 @@ The one thing to note is the method calls return `Py` objects, as there is no in
 ```jldoctest overview
 julia> stats = Sym(stats);
 
+julia> X = stats.Normal("X", μ, σ)
+X
+
 julia> stats.variance(X)
 σ^2
 ```
@@ -186,8 +189,8 @@ The value of `c1` prints as a tuple, but is of type `Sym` and sympy type `CondEx
 
 ```jldoctest overview
 julia> [Sym(a.py[1]) => Sym(a.py[0]) for a ∈ as]
-2-element Vector{Pair{Py, Py}}:
- Ne(n, -1) => x**(n + 1)/(n + 1)
+2-element Vector{Pair{Sym, Sym}}:
+ Ne(n, -1) => x^(n + 1)/(n + 1)
       True => log(x)
 ```
 
