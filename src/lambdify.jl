@@ -34,18 +34,18 @@ end
 ## most are handled by Symbol(fnname), the following catch exceptions
 ## Hack to avoid Expr(:call,  :*,2, x)  being  2x and  not  2*x
 ## As of newer sympy versions, this is no longer needed.
-__PROD__(args...) =  prod(args)
+_PROD_(args...) =  prod(args)
 
-__ANY__(xs...) = any(xs)
-__ALL__(xs...) = all(xs)
-__ZERO__(xs...) = 0
+_ANY_(xs...) = any(xs)
+_ALL_(xs...) = all(xs)
+_ZERO_(xs...) = 0
 # not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
-__HEAVISIDE__ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
-#  __SYMPY__ALL__,
+_HEAVISIDE_ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
+#  _SYMPY_ALL_,
 fn_map = Dict(
     "Add" => :+,
     "Sub" => :-,
-    "Mul" => :((as...)->prod(as)), #:*, # :(SymPy.__PROD__)
+    "Mul" => :((as...)->prod(as)), #:*, # :(SymPy._PROD_)
     "Div" => :/,
     "Pow" => :^,
     "re"  => :real,
@@ -55,9 +55,9 @@ fn_map = Dict(
     "Max" => :max,
     "Poly" => :identity,
     "Piecewise" => :(SymPyPythonCall._piecewise),
-    "Order" => :(SymPyPythonCall.__ZERO__), # :(as...) -> 0,
-    "And" => :(SymPyPythonCall.__ALL__), #:((as...) -> all(as)), #:(&),
-    "Or" =>  :(SymPyPythonCall.__ANY__), #:((as...) -> any(as)), #:(|),
+    "Order" => :(SymPyPythonCall._ZERO_), # :(as...) -> 0,
+    "And" => :(SymPyPythonCall._ALL_), #:((as...) -> all(as)), #:(&),
+    "Or" =>  :(SymPyPythonCall._ANY_), #:((as...) -> any(as)), #:(|),
     "Less" => :(<),
     "LessThan" => :(<=),
     "StrictLessThan" => :(<),
@@ -69,7 +69,7 @@ fn_map = Dict(
     "Greater" => :(>),
     "conjugate" => :conj,
     "atan2" => :atan,
-    "Heaviside" => :(SymPyPythonCall.__HEAVISIDE__),
+    "Heaviside" => :(SymPyPythonCall._HEAVISIDE_),
 )
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
@@ -227,7 +227,7 @@ function convert_expr(ex::Sym;
                       fns=Dict(), values=Dict(),
                       use_julia_code=false)
     if use_julia_code
-        body = (Meta.parse ∘ string)(__sympy__.julia_code(ex)) # issue here with 2.*...
+        body = (Meta.parse ∘ string)(_sympy_.julia_code(ex)) # issue here with 2.*...
     else
         body = walk_expression(ex, fns=fns, values=values)
     end

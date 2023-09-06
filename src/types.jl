@@ -61,6 +61,9 @@ Sym(x::Irrational{:e}) = sympy.E
 struct SymbolicCallable
     val
 end
+PythonCall.Py(x::SymbolicCallable) = x.val
+PythonCall.ispy(x::SymbolicCallable) = true
+
 Base.show(io::IO, λ::SymbolicCallable) = print(io, "Callable SymPy method")
 function (v::SymbolicCallable)(args...; kwargs...)
     ↑(v.val(unSym.(args)...; unSymkwargs(kwargs)...))
@@ -70,9 +73,10 @@ struct SymFunction <: SymbolicObject
     py::Py
 end
 PythonCall.Py(u::SymFunction) = u.py
+PythonCall.ispy(u::SymFunction) = true
 
 function SymFunction(x::AbstractString; kwargs...)
-    λ = __sympy__.Function(x; unSymkwargs(kwargs)...)
+    λ = _sympy_.Function(x; unSymkwargs(kwargs)...)
     SymFunction(λ)
 end
 (u::SymFunction)(xs...) = ↑(Py(u)(↓(xs)...))

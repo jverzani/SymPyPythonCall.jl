@@ -48,47 +48,48 @@ export sympy,
 
 
 # define sympy in int
-const __sympy__ = PythonCall.pynew()
-const sympy = Sym(__sympy__)
+const _sympy_ = PythonCall.pynew()
+const sympy = Sym(_sympy_)
 
 # core.sympy.numbers
-const __PI__ = PythonCall.pynew()
-const PI = Sym(__PI__)
+const _PI_ = PythonCall.pynew()
+const PI = Sym(_PI_)
 
-const __E__ = PythonCall.pynew()
-const E = Sym(__E__)
+const _E_ = PythonCall.pynew()
+const E = Sym(_E_)
 
 
-const __IM__ = PythonCall.pynew()
-const IM = Sym(__IM__)
+const _IM_ = PythonCall.pynew()
+const IM = Sym(_IM_)
 
-const __oo__ = PythonCall.pynew()
-const oo = Sym(__oo__)
+const _oo_ = PythonCall.pynew()
+const oo = Sym(_oo_)
 
-const __zoo__ = PythonCall.pynew()
-const zoo = Sym(__zoo__)
+const _zoo_ = PythonCall.pynew()
+const zoo = Sym(_zoo_)
 
-const __TRUE__ = PythonCall.pynew()
-const TRUE = Sym(__TRUE__)
+const _TRUE_ = PythonCall.pynew()
+const TRUE = Sym(_TRUE_)
 
-const __FALSE__ = PythonCall.pynew()
-const FALSE = Sym(__FALSE__)
+const _FALSE_ = PythonCall.pynew()
+const FALSE = Sym(_FALSE_)
 
-const __𝑄__ = PythonCall.pynew()
-const 𝑄 = Sym(__𝑄__)
+const _𝑄_ = PythonCall.pynew()
+const 𝑄 = Sym(_𝑄_)
 
 function __init__()
 
-    PythonCall.pycopy!(__sympy__, PythonCall.pyimport("sympy"))
+    PythonCall.pycopy!(_sympy_, PythonCall.pyimport("sympy"))
 
-    PythonCall.pycopy!(__PI__, __sympy__.pi)
-    PythonCall.pycopy!(__E__, __sympy__.E)
-    PythonCall.pycopy!(__IM__, __sympy__.I)
-    PythonCall.pycopy!(__oo__, __sympy__.oo)
-    PythonCall.pycopy!(__zoo__, __sympy__.zoo)
-    PythonCall.pycopy!(__TRUE__, pyconvert(Py, true))
-    PythonCall.pycopy!(__FALSE__, pyconvert(Py, false))
-    PythonCall.pycopy!(__𝑄__, __sympy__.Q)
+    PythonCall.pycopy!(_PI_, _sympy_.pi)
+    PythonCall.pycopy!(_E_, _sympy_.E)
+    PythonCall.pycopy!(_IM_, _sympy_.I)
+    PythonCall.pycopy!(_oo_, _sympy_.oo)
+    PythonCall.pycopy!(_zoo_, _sympy_.zoo)
+    PythonCall.pycopy!(_TRUE_, pyconvert(Py, true))
+    PythonCall.pycopy!(_FALSE_, pyconvert(Py, false))
+    PythonCall.pycopy!(_𝑄_, _sympy_.Q)
+
 
 end
 
