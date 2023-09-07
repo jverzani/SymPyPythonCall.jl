@@ -60,7 +60,7 @@ function pyconvert_rule_sympy_function(::Type{Symbolics.Num}, x)
     if !pyisinstance(x,sp.Function)
         return PythonCall.pyconvert_unconverted()
     end
-    nm = PythonCall.pygetattr(x, "func", nothing).name
+    nm = PythonCall.pygetattr(PythonCall.pygetattr(x, "func", nothing),"name",nothing)
     isnothing(nm) && return PythonCall.pyconvert_unconverted() # XXX
     name = pyconvert(Symbol, nm)
     args = pyconvert.(Symbolics.Num, x.args)
