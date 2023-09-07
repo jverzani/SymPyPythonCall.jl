@@ -17,8 +17,21 @@ asSymbolic(x) = Sym(pyconvert(Py, x))
 asSymbolic(x::Sym) = x
 asSymbolic(x::String) = Sym(x)
 
-PyTypeName(x) = Val(Symbol(PythonCall.pyconvert_typename(pytype(x))))
-asSymbolic(x::Py) = asSymbolic(PyTypeName(x), x) # special case based on typename
+# a bit more performant than the following, but still too slow.
+#PyTypeName(x) = Symbol(PythonCall.pyconvert_typename(pytype(x)))
+# allocates muchmore than pyhash, but doesn't seem to be a bottleneck
+function PyTypeName(u)
+    v = pytype(u)
+    δ = pystr("<unknown>")
+    m = pygetattr(v,"__module__", δ)
+    m = pyconvert(Bool, m == pybuiltins.None) ? δ : m
+    a = m +  pystr(":") + pygetattr(v, "__name__", δ)
+    return pyconvert(Symbol, a)
+    #@show s
+    #s
+    :nada
+end
+asSymbolic(x::Py) = asSymbolic(Val(PyTypeName(x)), x) # special case based on typename
 
 asSymbolic(::Val{T}, x::Py) where {T} = Sym(x) # fallback
 
@@ -28,7 +41,6 @@ asSymbolic(::Val{Symbol("builtins:dict")}, x::Py) = Dict(asSymbolic(k) => asSymb
 asSymbolic(::Val{Symbol("builtins:set")}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
 asSymbolic(::Val{Symbol("sympy.sets.sets:FiniteSet")}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
 asSymbolic(::Val{Symbol("sympy.core.containers:Tuple")}, x::Py) = Tuple(asSymbolic(xᵢ) for xᵢ ∈ x)
-
 function _as_symbolic_dense_matrix(x)
     sz = pyconvert(Tuple, x.shape)
     return [asSymbolic(x.__getitem__((i-1, j-1))) for i ∈ 1:sz[1], j ∈ 1:sz[2]]
@@ -44,8 +56,9 @@ end
 asSymbolic(::Val{Symbol("sympy.matrices.expressions.matexpr:MatrixSymbol")}, x::Py) = _as_symbolic_symbolic_matrix(x)
 asSymbolic(::Val{Symbol("sympy.matrices.expressions.inverse:Inverse")}, x::Py) = _as_symbolic_symbolic_matrix(x)
 
+
 # used to pass arguments down into calls
-unSym(x) = x
+unSym(x) = Py(x)
 unSym(x::Sym) = getfield(x, :py)
 unSym(x::Tuple) = unSym.(x)
 unSym(x::Vector) = Tuple(unSym.(x)) # <-- is this an issue?
@@ -53,7 +66,7 @@ unSym(x::Matrix) = sympy.py.Matrix(Tuple(↓(mᵢ) for mᵢ ∈ eachrow(x))) # m
 unSym(x::Dict) = convert(PyDict,Dict(unSym(k) => unSym(v) for (k,v) ∈ x)) # AbstractDict?
 unSym(x::Set) = sympy.py.Set(unSym(collect(x)))
 unSym(x::Irrational{:π}) = unSym(sympy.pi)
-unSymkwargs(kw) = (k=>unSym(v) for (k,v) ∈ kw)
+unSymkwargs(kw) = (k=>unSym(v) for (k,v) ∈ kw) # unsym NamedTuple?
 
 
 #PythonCall.Py(x::Sym) = ↓(x)

@@ -1,4 +1,4 @@
-_symbols(a; kwargs...) = Sym(__sympy__.symbols(a; kwargs...))
+_symbols(a; kwargs...) = Sym(_sympy_.symbols(a; kwargs...))
 # split on comma (add space?)
 symbols(a; kwargs...) = contains(a, ",") ? _symbols.(split(a, ","); kwargs...) : _symbols(a; kwargs...)
 
