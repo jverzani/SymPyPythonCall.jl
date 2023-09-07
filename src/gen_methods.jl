@@ -56,51 +56,9 @@ end
 asSymbolic(::Val{Symbol("sympy.matrices.expressions.matexpr:MatrixSymbol")}, x::Py) = _as_symbolic_symbolic_matrix(x)
 asSymbolic(::Val{Symbol("sympy.matrices.expressions.inverse:Inverse")}, x::Py) = _as_symbolic_symbolic_matrix(x)
 
-#=
-# The above `PyTypeName` is a bit more performant than PyTypeName(x) = Symbol(PythonCall.pyconvert_typename(pytype(x))) but
-# this would be much faster:
-PyTypeName(x::Py) = pyhash(pytype(x))
-# But we would need to find the hash for the selected pytypes at the time of initialization. as hashing is
-# not guaranteed to be portable. So, we would need to put the values in `__init__`, like:
-    pytypehash[pybuiltins.list]  = pyhash(pybuiltins.list)
-    asSymbolic(::Val{pyhash(pybuiltins.list)}, x::Py) = isempty(x) ? Sym[] : [asSymbolic(xᵢ) for xᵢ ∈ x] # XXX are lists Tuples or vectors???
-# The above works fine, so has promise, but for some reason doesn't work with
-   pytypehash[_sympy_.sets.sets.FiniteSet] = pyhash(_sympy_.sets.sets.FiniteSet)
-asSymbolic(::Val{pytypehash["sympy.sets.sets:FiniteSet"]}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
-#which is a deal breaker.
-    pytypehash[_sympy_.core.containers.Tuple] = pyhash(_sympy_.core.containers.Tuple)
-    pytypehash[_sympy_.matrices.dense.MutableDenseMatrix], pyhash(_sympy_.matrices.dense.MutableDenseMatrix)
-    pytypehash[_sympy_.matrices.dense.ImmutableDenseMatrix], pyhash(_sympy_.matrices.dense.ImmutableDenseMatrix)
-    pytypehash[_sympy_.matrices.expressions.matexpr.MatrixSymbol], pyhash(_sympy_.matrices.expressions.matexpr.MatrixSymbol)
-    pytypehash[_sympy_.matrices.expressions.inverse.Inverse], pyhash(_sympy_.matrices.expressions.inverse,Inverse)
-    asSymbolic(::Val{__finite_set()}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
-    asSymbolic(::Val{pyhash(_sympy_.sets.sets.FiniteSet)}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
-    asSymbolic(::Val{pyhash(_sympy_.core.containers.Tuple)}, x::Py) = Tuple(asSymbolic(xᵢ) for xᵢ ∈ x)
-    asSymbolic(::Val{pytypehash["builtins:list"]}, x::Py) = isempty(x) ? Sym[] : [asSymbolic(xᵢ) for xᵢ ∈ x] # XXX are lists Tuples or vectors???
-    asSymbolic(::Val{pytypehash["builtins:tuple"]}, x::Py) = Tuple(asSymbolic(xᵢ) for xᵢ ∈ x)
-    asSymbolic(::Val{pytypehash["builtins:dict"]}, x::Py) = Dict(asSymbolic(k) => asSymbolic(v) for (k,v) ∈ pyconvert(PyDict, x))
-    asSymbolic(::Val{pytypehash["builtins:set"]}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
-    asSymbolic(::Val{pytypehash["sympy.sets.sets:FiniteSet"]}, x::Py) = Set(asSymbolic(xᵢ) for xᵢ ∈ x)
-    asSymbolic(::Val{pytypehash["sympy.core.containers:Tuple"]}, x::Py) = Tuple(asSymbolic(xᵢ) for xᵢ ∈ x)
-
-# function _as_symbolic_dense_matrix(x)
-#     sz = pyconvert(Tuple, x.shape)
-#     return [asSymbolic(x.__getitem__((i-1, j-1))) for i ∈ 1:sz[1], j ∈ 1:sz[2]]
-# end
-# asSymbolic(::Val{pytypehash["sympy.matrices.dense:MutableDenseMatrix"]}, x::Py) = _as_symbolic_dense_matrix(x)
-# asSymbolic(::Val{pytypehash["sympy.matrices.dense:ImmutableDenseMatrix"]}, x::Py) = _as_symbolic_dense_matrix(x)
-
-# function _as_symbolic_symbolic_matrix(x)
-#     sz = pyconvert(Tuple, x.shape)
-#     !isa(sz[1], Real) && return Sym(x) # MatrixSymbol special case
-#     return [asSymbolic(x.__getitem__((i-1, j-1))) for i ∈ 1:sz[1], j ∈ 1:sz[2]]
-# end
-# asSymbolic(::Val{pytypehash["sympy.matrices.expressions.matexpr:MatrixSymbol"]}, x::Py) = _as_symbolic_symbolic_matrix(x)
-# asSymbolic(::Val{pytypehash["sympy.matrices.expressions.inverse:Inverse"]}, x::Py) = _as_symbolic_symbolic_matrix(x)
-=#
 
 # used to pass arguments down into calls
-unSym(x) = x
+unSym(x) = Py(x)
 unSym(x::Sym) = getfield(x, :py)
 unSym(x::Tuple) = unSym.(x)
 unSym(x::Vector) = Tuple(unSym.(x)) # <-- is this an issue?
@@ -108,7 +66,7 @@ unSym(x::Matrix) = sympy.py.Matrix(Tuple(↓(mᵢ) for mᵢ ∈ eachrow(x))) # m
 unSym(x::Dict) = convert(PyDict,Dict(unSym(k) => unSym(v) for (k,v) ∈ x)) # AbstractDict?
 unSym(x::Set) = sympy.py.Set(unSym(collect(x)))
 unSym(x::Irrational{:π}) = unSym(sympy.pi)
-unSymkwargs(kw) = (k=>unSym(v) for (k,v) ∈ kw)
+unSymkwargs(kw) = (k=>unSym(v) for (k,v) ∈ kw) # unsym NamedTuple?
 
 
 #PythonCall.Py(x::Sym) = ↓(x)
