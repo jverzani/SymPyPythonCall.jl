@@ -51,7 +51,7 @@ function pyconvert_rule_sympy_derivative(::Type{Symbolics.Num}, x)
         return PythonCall.pyconvert_unconverted()
     end
     variables = pyconvert.(Symbolics.Num,x.variables)
-    derivatives = prod(var -> Differential(var), variables)
+    derivatives = prod(var -> Symbolics.Differential(var), variables)
     expr = pyconvert(Symbolics.Num, x.expr)
     return PythonCall.pyconvert_return(derivatives(expr))
 end
@@ -60,7 +60,7 @@ function pyconvert_rule_sympy_function(::Type{Symbolics.Num}, x)
     if !pyisinstance(x,sp.Function)
         return PythonCall.pyconvert_unconverted()
     end
-    nm = PythonCall.pygetattr(x, "func", nothing)
+    nm = PythonCall.pygetattr(PythonCall.pygetattr(x, "func", nothing),"name",nothing)
     isnothing(nm) && return PythonCall.pyconvert_unconverted() # XXX
     name = pyconvert(Symbol, nm)
     args = pyconvert.(Symbolics.Num, x.args)
