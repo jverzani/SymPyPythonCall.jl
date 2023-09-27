@@ -36,41 +36,47 @@ end
 ## As of newer sympy versions, this is no longer needed.
 _PROD_(args...) =  prod(args)
 
-_ANY_(xs...) = any(xs)
-_ALL_(xs...) = all(xs)
-_ZERO_(xs...) = 0
+_ANY_(xs...) = any(xs) # any∘tuple ?
+_ALL_(xs...) = all(xs) # all∘tuple
+_ZERO_(xs...) = 0      #
 # not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
-_HEAVISIDE_ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
-#  _SYMPY_ALL_,
-fn_map = Dict(
-    "Add" => :+,
-    "Sub" => :-,
-    "Mul" => :((as...)->prod(as)), #:*, # :(SymPy._PROD_)
-    "Div" => :/,
-    "Pow" => :^,
-    "re"  => :real,
-    "im"  => :imag,
-    "Abs" => :abs,
-    "Min" => :min,
-    "Max" => :max,
-    "Poly" => :identity,
-    "Piecewise" => :(SymPyPythonCall._piecewise),
-    "Order" => :(SymPyPythonCall._ZERO_), # :(as...) -> 0,
-    "And" => :(SymPyPythonCall._ALL_), #:((as...) -> all(as)), #:(&),
-    "Or" =>  :(SymPyPythonCall._ANY_), #:((as...) -> any(as)), #:(|),
-    "Less" => :(<),
-    "LessThan" => :(<=),
-    "StrictLessThan" => :(<),
-    "Equal" => :(==),
-    "Equality" => :(==),
-    "Unequality" => :(!==),
-    "StrictGreaterThan" => :(>),
-    "GreaterThan" => :(>=),
-    "Greater" => :(>),
-    "conjugate" => :conj,
-    "atan2" => :atan,
-    "Heaviside" => :(SymPyPythonCall._HEAVISIDE_),
+_HEAVISIDE_(a...)  = (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
+
+## Map to get function object from type information
+# we may want fn or expression, Symbol(+) yields :+ but allocates to make a string
+sympy_fn_julia_fn = Dict(
+    "Add" => (+, :+),
+    "Sub" => (-, :-),
+    "Mul" => (*, :*),
+    "Div" => (/, :/),
+    "Pow" => (^, :^),
+    "re"  => (real, :real),
+    "im"  => (imag, :imag),
+    "Abs" => (abs, :abs),
+    "Min" => (min, :min),
+    "Max" => (max, :max),
+    "Poly" => (identity, :identity),
+    "conjugate" => (conj, :conj),
+    "atan2" => (atan, :atan),
+    #
+    "Less" => (<, :(<)),
+    "LessThan" => (<=, :(<=)),
+    "StrictLessThan" => (<, :(<)),
+    "Equal" => (==, :(==)),
+    "Equality" => (==, :(==)),
+    "Unequality" => (!==, :(!==)),
+    "StrictGreaterThan" => (>, :(>)),
+    "GreaterThan" => (>=, :(>=)),
+    "Greater" => (>, :(>)),
+    #
+    "Piecewise" => (SymPyPythonCall._piecewise,  :(SymPyPythonCall._piecewise)),
+    "Heaviside" => (SymPyPythonCall._HEAVISIDE_, :(SymPyPythonCall._HEAVISIDE_)),
+    "Order" =>     (SymPyPythonCall._ZERO_,      :(SymPyPythonCall._ZERO_)),
+    "And" =>       (all∘tuple,                   :(SymPyPythonCall._ALL_)),
+    "Or" =>        (any∘tuple,                   :(SymPyPythonCall._ANY_)),
 )
+
+const  fn_map = Dict(k => last(v) for (k,v) ∈ pairs(sympy_fn_julia_fn))
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
 

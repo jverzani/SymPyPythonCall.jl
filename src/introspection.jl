@@ -2,7 +2,7 @@
 ## Module for Introspection
 module Introspection
 
-import SymPyPythonCall: Sym, asSymbolic
+import SymPyPythonCall: Sym, asSymbolic, sympy_fn_julia_fn
 using PythonCall
 import PythonCall: Py
 export args, func, funcname, class, classname, getmembers
@@ -47,40 +47,14 @@ end
 class(x::T) where {T <: Union{Sym, Py}} = getattr(x, "__class__", nothing)
 classname(x::T) where {T <: Union{Sym, Py}} = (cls = class(x); isnothing(cls) ? "" : cls.__name__)
 
+# map funcname value (a string) to a function object
+# special cases are in lambidfy.jl
+const  funcname2function = Dict(k => first(v) for (k,v) ∈ pairs(sympy_fn_julia_fn))
+
+
 #function getmembers(x::T) where {T <: Union{Sym, PyObject}}
 #    Dict(u=>v for (u,v) in inspect.getmembers(x))
 #end
 
-## Map to get function object from type information
-const funcname2function = (
-    Add = +,
-    Sub = -,
-    Mul = *,
-    Div = /,
-    Pow = ^,
-    re  = real,
-    im  = imag,
-    Abs = abs,
-    Min = min,
-    Max = max,
-    Poly = identity,
-    Piecewise = error, # replace
-    Order = (as...) -> 0,
-    And = (as...) -> all(as),
-    Or =  (as...) -> any(as),
-    Less = <,
-    LessThan = <=,
-    StrictLessThan = <,
-    Equal = ==,
-    Equality = ==,
-    Unequality = !==,
-    StrictGreaterThan = >,
-    GreaterThan = >=,
-    Greater = >,
-    conjugate = conj,
-    atan2 = atan,
-    TupleArg = tuple,
-    Heaviside =  (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN))),
-)
 
 end

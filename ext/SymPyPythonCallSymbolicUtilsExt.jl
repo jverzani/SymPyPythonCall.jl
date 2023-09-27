@@ -22,11 +22,10 @@ Returns the head (a function object) performed by an expression tree. Called onl
 ==#
 function SymbolicUtils.operation(x::SymPyPythonCall.SymbolicObject)
     @assert SymbolicUtils.istree(x)
-    nm = Symbol(SymPyPythonCall.Introspection.funcname(x))
-
+    nm = SymPyPythonCall.Introspection.funcname(x)
     λ = get(SymPyPythonCall.Introspection.funcname2function, nm, nothing)
     if isnothing(λ)
-        return getfield(Main, nm)
+        return getfield(Main, Symbol(nm))
     else
         return λ
     end
