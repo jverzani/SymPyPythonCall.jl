@@ -8,7 +8,7 @@ using Documenter
 makedocs(
     sitename = "SymPyPythonCall",
     format = Documenter.HTML(),
-    modules = [SymPyPythonCall]
+    modules = [SymPyPythonCall],
     warnonly = [:missing_docs],
 )
 
