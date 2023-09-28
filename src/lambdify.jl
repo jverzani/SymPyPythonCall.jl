@@ -219,11 +219,17 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
                    invoke_latest=true)
     if isempty(vars)
         # can't call N(ex) here...
-        v = ex.evalf()
-        if v.is_real == True
-            val = convert(Real, v)
+        flag = pygetattr(ex, "evalf", nothing)
+        if isnothing(flag)
+            val = pyconvert(Real, ex)
         else
-            val = Complex(convert(Real, real(v)), convert(Real, imag(v)))
+            v = ex.evalf()
+            if pyconvert(Bool, v.is_real)
+                val = pyconvert(Real, v)
+            else
+                a,b = pyconvert.(Real, (real(v), imag(v)))
+                val = Complex(a, b)
+            end
         end
         return (ts...) -> val
     end

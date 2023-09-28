@@ -633,6 +633,13 @@ end
     @test u(.5) == 1
     @test u(1.5) == 0
 
+    # SymPy issue 567; constants
+    u = lambdify(Sym(1//2))
+    @test u() == u(1,2,3) == 1/2
+    @syms x
+    ex = integrate(sqrt(1 + (1/x)^2), (x, 1/sympy.E, sympy.E))
+    @test lambdify(ex)() ≈ 3.1961985135995072
+
 #    i2 = SymPy.lambdify_expr(x^2,name=:square)
 #    @test i2.head == :function
 #    @test i2.args[1].args[1] == :square
