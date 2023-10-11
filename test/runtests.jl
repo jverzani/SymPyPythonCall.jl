@@ -1,19 +1,21 @@
 using SymPyPythonCall
+
+using SymPyCore
+using LinearAlgebra
+using SpecialFunctions
 using Test
 
-include("tests.jl")
-include("test-math.jl")
-include("test-matrix.jl")
-include("test-ode.jl")
-#=
-=#
-include("test-logical.jl")
-include("test-specialfuncs.jl")
-#include("test-permutations.jl")
-#include("test-physics.jl")
-#include("test-external-module.jl")
-include("test-latexify.jl")
 
-if VERSION >= v"1.9.0-"
-    @testset "Symbolics integration" begin include("symbolics-integration.jl") end
-end
+path = joinpath(pathof(SymPyPythonCall.SymPyCore), "../../test")
+
+include(joinpath(path, "test-legacy.jl")) # need to clean these up!
+include(joinpath(path, "test-core.jl"))
+include(joinpath(path, "test-math.jl"))
+include(joinpath(path, "test-matrix.jl"))
+include(joinpath(path, "test-specialfuncs.jl"))
+include(joinpath(path, "test-ode.jl"))
+#include(joinpath(path, "test-lambdify.jl"))
+#include(joinpath(path, "test-logical.jl"))
+#include(joinpath(path, "test-permuations.jl"))
+#include(joinpath(path, "test-physics.jl"))
+#include(joinpath(path, "test-external-module.jl"))

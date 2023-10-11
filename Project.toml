@@ -1,41 +1,27 @@
 name = "SymPyPythonCall"
 uuid = "bc8888f7-b21e-4b7c-a06a-5d9c9496438c"
 authors = ["jverzani <jverzani@gmail.com> and contributors"]
-version = "0.1.2"
+version = "0.2.0"
 
 [deps]
 CommonEq = "3709ef60-1bee-4518-9f2f-acd86f176c50"
 CommonSolve = "38540f10-b2f7-11e9-35d8-d573e4eb0ff2"
 CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
-Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
-RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
-
-[weakdeps]
-Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
-
-[extensions]
-SymPyPythonCallSymbolicsExt = "Symbolics"
-SymPyPythonCallSymbolicUtilsExt = "SymbolicUtils"
+SymPyCore = "458b697b-88f0-4a86-b56b-78b75cfb3531"
 
 [compat]
 julia = "1.6.1"
 CommonEq = "0.2"
 CommonSolve = "0.2"
 CondaPkg = "0.2"
-Latexify = "0.15, 0.16"
 PythonCall = "0.9"
-RecipesBase = "0.7, 0.8, 1.0, 1.1"
 SpecialFunctions = "0.8, 0.9, 0.10, 1.0, 2"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 
 [targets]
-test = ["Symbolics", "Test"]
+test = ["Test"]
