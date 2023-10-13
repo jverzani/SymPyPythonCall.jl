@@ -1,11 +1,7 @@
 name = "SymPyPythonCall"
 uuid = "bc8888f7-b21e-4b7c-a06a-5d9c9496438c"
 authors = ["jverzani <jverzani@gmail.com> and contributors"]
-<<<<<<< HEAD
 version = "0.2.0"
-=======
-version = "0.1.3"
->>>>>>> main
 
 [deps]
 CommonEq = "3709ef60-1bee-4518-9f2f-acd86f176c50"

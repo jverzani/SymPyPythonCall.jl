@@ -5,3 +5,5 @@
 /docs/const
 /docs/import
 .CondaPkg/*
+default.profraw
+/test/default.profraw
