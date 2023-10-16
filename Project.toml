@@ -15,6 +15,7 @@ SymPyCore = "458b697b-88f0-4a86-b56b-78b75cfb3531"
 [compat]
 julia = "1.6.1"
 LinearAlgebra = "1"
+SymPyCore = "0.1"
 CommonEq = "0.2"
 CommonSolve = "0.2"
 CondaPkg = "0.2"
