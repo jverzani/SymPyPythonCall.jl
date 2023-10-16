@@ -1,15 +1,36 @@
 ## PythonCall specific usage
+Base.convert(::Type{Complex{S}}, x::Sym{T}) where {S<:Number, T<:PythonCall.Py} =
+    Complex(convert(S, real(x)), convert(S, imag(x)))
+
+Base.convert(::Type{S}, x::Sym{T}) where {T <: PythonCall.Py, S<:Sym} = x
+Base.convert(::Type{S}, x::T) where {T<:PythonCall.Py, S <: SymbolicObject} = Sym(x)
+
 SymPyCore._convert(::Type{T}, x) where {T} = pyconvert(T, x)
 SymPyCore._convert(::Type{Bool}, x)  = pyconvert(Bool, pybool(x))
 
 
 ## Modifications for ↓, ↑
+Sym(x::Nothing) = Sym(pybuiltins.None)
 SymPyCore.:↓(x::PythonCall.Py) = x
 SymPyCore.:↓(d::Dict) = pydict((↓(k) => ↓(v) for (k,v) ∈ pairs(d)))
 SymPyCore.:↓(x::Set) = _sympy_.sympify(pyset(↓(sᵢ) for sᵢ ∈ x))
-SymPyCore.:↑(::Type{<:AbstractString}, x) = Py(x)
 
-Sym(x::Nothing) = Sym(pybuiltins.None)
+SymPyCore.:↑(::Type{<:AbstractString}, x) = Py(x)
+function SymPyCore.:↑(::Type{PythonCall.Py}, x)
+    class_nm = SymPyCore.classname(x)
+    class_nm == "set"       && return Set(Sym.(collect(x)))
+    class_nm == "tuple" && return Tuple(↑(xᵢ) for xᵢ ∈ x)
+    class_nm == "list" && return [↑(xᵢ) for xᵢ ∈ x]
+    class_nm == "dict" && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
+
+    class_nm == "FiniteSet" && return Set(Sym.(collect(x)))
+    class_nm == "MutableDenseMatrix" && return _up_matrix(x) #map(↑, x.tolist())
+
+    # others ... more hands on than pytype_mapping
+
+    Sym(x)
+end
+
 
 function _up_matrix(m) # ↑ for matrices
     sh = m.shape
@@ -31,6 +52,7 @@ function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PythonCal
     val = ↓(x)
     if hasproperty(val, a)
         meth = getproperty(val, a)
+
         pyconvert(Bool, meth == pybuiltins.None) && return nothing
 
         if hasproperty(meth, "is_Boolean")
@@ -54,15 +76,15 @@ function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PythonCal
         end
         ## __function__
         if hasproperty(meth, "__call__")
-            meth = getproperty(meth, "__call__")
+            #meth = getproperty(meth, "__call__")
             return SymPyCore.SymbolicCallable(meth)
         end
 
-        return Sym(convert(PythonCall.Py, meth))
+        return ↑(convert(PythonCall.Py, meth))
 
     end
+    # not a property; should this error
     return nothing
-    @show :huh_getproperty_not_found, string(a)
 end
 
 
