@@ -7,7 +7,7 @@
 [SymPyCore](https://github.com/jverzani/SymPyCore.jl) provides a `Julia`n interface to the [SymPy](https://www.sympy.org/) library of Python.
 
 
-`SymPyPythonCall` utilizes `SymPyCore` and the `PythonCall` package (to provide the interop between `Julia` and `Python`) to enable access to Python's SymPy library using the practices and idioms of `Julia`.
+[SymPyPythonCall](https://github.com/jverzani/SymPyPythonCall.jl) utilizes `SymPyCore` and the `PythonCall` package (to provide the interop between `Julia` and `Python`) to enable access to Python's SymPy library using the practices and idioms of `Julia`.
 
 The package [SymPyPyCall](https://github.com/jverzani/SymPyPyCall.jl) does a similar thing with the `PyCall` package providing the interop.
 
