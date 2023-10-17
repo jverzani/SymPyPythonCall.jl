@@ -20,6 +20,7 @@ core_src_path = joinpath(pathof(SymPyCore), "../../src/SymPy")
 include(joinpath(core_src_path, "sympy.jl"))
 
 include("python_connection.jl")
+include("deprecated.jl")
 
 
 end
