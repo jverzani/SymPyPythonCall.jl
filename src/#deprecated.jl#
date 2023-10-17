@@ -1,8 +1,0 @@
-# deprecations
-
-Base.@deprecate unSym(x) ↓(x)
-Base.@deprecate asSymbolic(x) ↑(x)
-
-Base.@deprecate VectorField
-Base.@deprecate plot_parametric_surface
-Base.@deprecate plot_implicit
