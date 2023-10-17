@@ -1,4 +1,0 @@
-[deps]
-SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
-SymPyCore = "458b697b-88f0-4a86-b56b-78b75cfb3531"
-SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
