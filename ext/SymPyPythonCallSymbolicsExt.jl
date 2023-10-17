@@ -3,16 +3,16 @@ module SymPyPythonCallSymbolicsExt
 # from https://github.com/JuliaSymbolics/Symbolics.jl/pull/957/
 # by @jClugstor
 import SymPyPythonCall
-sp = SymPyPythonCall.sympy.py
+sp = SymPyPythonCall._sympy_
 const PythonCall = SymPyPythonCall.PythonCall
 import PythonCall: pyconvert, pyimport, pyisinstance
 
 import Symbolics
 import Symbolics: @variables
 
+PythonCall.pyconvert(::Type{T}, x::SymPyPythonCall.Sym) where {T} = pyconvert(T, x.o)
+
 # rule functions
-function pyconvert_rule_sympy_symbolX(::Type{Symbolics.Num}, x)
-end
 function pyconvert_rule_sympy_symbol(::Type{Symbolics.Num}, x)
     if !pyisinstance(x,sp.Symbol)
         return PythonCall.pyconvert_unconverted()
