@@ -11,19 +11,27 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 SymPyCore = "458b697b-88f0-4a86-b56b-78b75cfb3531"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+
+[weakdeps]
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+
+[extensions]
+SymPyPythonCallSymbolicsExt = "Symbolics"
 
 [compat]
-julia = "1.6.1"
-LinearAlgebra = "1"
-SymPyCore = "0.1"
 CommonEq = "0.2"
 CommonSolve = "0.2"
 CondaPkg = "0.2"
+LinearAlgebra = "1"
 PythonCall = "0.9"
 SpecialFunctions = "0.8, 0.9, 0.10, 1.0, 2"
+SymPyCore = "0.1"
+julia = "1.6.1"
 
 [extras]
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["Symbolics", "Test"]
