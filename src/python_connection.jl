@@ -49,6 +49,10 @@ end
 # should we also have different code path for a::String like  PyCall?
 function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PythonCall.Py}
     a == :o && return getfield(x, a)
+    if a == :py
+        Base.depwarn("The field `.py` has been renamed `.o`", :getproperty)
+        return getfield(x,:o)
+    end
     val = ↓(x)
     if hasproperty(val, a)
         meth = getproperty(val, a)
