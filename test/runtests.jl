@@ -3,4 +3,4 @@ using SymPyPythonCall
 path = joinpath(pathof(SymPyPythonCall.SymPyCore), "../../test")
 include(joinpath(path, "runtests-sympycore.jl"))
 
-include("symbolics-integration.jl")
+VERSION >= v"1.9.0" && include("extension-symbolics.jl")
