@@ -6,7 +6,11 @@ Base.convert(::Type{S}, x::Sym{T}) where {T <: PythonCall.Py, S<:Sym} = x
 Base.convert(::Type{S}, x::T) where {T<:PythonCall.Py, S <: SymbolicObject} = Sym(x)
 
 SymPyCore._convert(::Type{T}, x) where {T} = pyconvert(T, x)
-SymPyCore._convert(::Type{Bool}, x)  = pyconvert(Bool, pybool(x))
+function SymPyCore._convert(::Type{Bool}, x::Py)
+    pyconvert(Bool, x == _sympy_.logic.boolalg.BooleanTrue) && return true
+    pyconvert(Bool, x == _sympy_.logic.boolalg.BooleanFalse) && return false
+    pyconvert(Bool, pybool(x))
+end
 
 
 ## Modifications for ↓, ↑
@@ -53,42 +57,39 @@ function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PythonCal
         Base.depwarn("The field `.py` has been renamed `.o`", :getproperty)
         return getfield(x,:o)
     end
+
     val = ↓(x)
-    if hasproperty(val, a)
-        meth = getproperty(val, a)
+    !hasproperty(val, a) && return nothing # not a property
 
-        pyconvert(Bool, meth == pybuiltins.None) && return nothing
+    meth = getproperty(val, a)
 
-        if hasproperty(meth, "is_Boolean")
-            o = Sym(getproperty(meth, "is_Boolean"))
-            o == Sym(true) && return true
-            a == :is_Boolean && return o == Sym(False) ? false : nothing
+    pyconvert(Bool, meth == pybuiltins.None) && return nothing
+
+    if hasproperty(meth, "is_Boolean")
+        if pyconvert(Bool, meth.is_Boolean == true)
+            return meth == _sympy_.logic.boolalg.BooleanFalse
         end
-
-        # __class__ dispath
-        if hasproperty(meth, :__class__)
-            cnm = string(meth.__class__.__name__)
-            if cnm == "bool"
-                a = Sym(meth)
-                return a == Sym(true) ? true :
-                    a == Sym(false) ? false : nothing
-            end
-            if cnm == "module"
-                # treat modules, callsm others differently
-                return Sym(meth)
-            end
-        end
-        ## __function__
-        if hasproperty(meth, "__call__")
-            #meth = getproperty(meth, "__call__")
-            return SymPyCore.SymbolicCallable(meth)
-        end
-
-        return ↑(convert(PythonCall.Py, meth))
-
     end
-    # not a property; should this error
-    return nothing
+
+    # __class__ dispatch
+    if hasproperty(meth, :__class__)
+        cnm = string(meth.__class__.__name__)
+        if cnm == "bool"
+            return pyconvert(Bool, meth)
+        end
+        if cnm == "module"
+            # treat modules, callsm others differently
+            return Sym(meth)
+        end
+    end
+
+    ## __call__
+    if hasproperty(meth, "__call__")
+        return SymPyCore.SymbolicCallable(meth)
+    end
+
+    return ↑(convert(PythonCall.Py, meth))
+
 end
 
 
