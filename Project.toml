@@ -19,7 +19,7 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 SymPyPythonCallSymbolicsExt = "Symbolics"
 
 [compat]
-CommonEq = "0.2"
+CommonEq = "0.2.1"
 CommonSolve = "0.2"
 CondaPkg = "0.2"
 LinearAlgebra = "1.6.1"
