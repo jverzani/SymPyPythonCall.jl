@@ -15,23 +15,24 @@ end
 
 ## Modifications for ↓, ↑
 Sym(x::Nothing) = Sym(pybuiltins.None)
+
 SymPyCore.:↓(x::PythonCall.Py) = x
 SymPyCore.:↓(d::Dict) = pydict((↓(k) => ↓(v) for (k,v) ∈ pairs(d)))
 SymPyCore.:↓(x::Set) = _sympy_.sympify(pyset(↓(sᵢ) for sᵢ ∈ x))
 
-SymPyCore.:↑(::Type{<:AbstractString}, x) = Py(x)
+SymPyCore.:↑(::Type{<:AbstractString}, x) = Sym(Py(x))
 function SymPyCore.:↑(::Type{PythonCall.Py}, x)
-    class_nm = SymPyCore.classname(x)
-    class_nm == "set"       && return Set(Sym.(collect(x)))
-    class_nm == "tuple" && return Tuple(↑(xᵢ) for xᵢ ∈ x)
-    class_nm == "list" && return [↑(xᵢ) for xᵢ ∈ x]
-    class_nm == "dict" && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
+    # this lower level approach shouldn't allocate
+    pyisinstance(x, pybuiltins.set) && return Set(Sym.(x)) #Set(↑(xᵢ) for xᵢ ∈ x)
+    pyisinstance(x, pybuiltins.tuple) && return Tuple(↑(xᵢ) for xᵢ ∈ x)
+    pyisinstance(x, pybuiltins.list) && return [↑(xᵢ) for xᵢ ∈ x]
+    pyisinstance(x, pybuiltins.dict) && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
 
-    class_nm == "FiniteSet" && return Set(Sym.(collect(x)))
-    class_nm == "MutableDenseMatrix" && return _up_matrix(x) #map(↑, x.tolist())
+    # add more sympy containers in sympy.jl and here
+    pyisinstance(x, _FiniteSet_) && return Set(Sym.(x))
+    pyisinstance(x, _MutableDenseMatrix_) && return _up_matrix(x) #map(↑, x.tolist())
 
-    # others ... more hands on than pytype_mapping
-
+    # fallback
     Sym(x)
 end
 
@@ -52,42 +53,38 @@ end
 
 # should we also have different code path for a::String like  PyCall?
 function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PythonCall.Py}
+
     a == :o && return getfield(x, a)
+
     if a == :py
         Base.depwarn("The field `.py` has been renamed `.o`", :getproperty)
         return getfield(x,:o)
     end
 
     val = ↓(x)
-    !hasproperty(val, a) && return nothing # not a property
+    𝑎 = string(a)
 
-    meth = getproperty(val, a)
+    hasproperty(val, 𝑎) || return nothing # not a property
+    meth = getproperty(val, 𝑎)
 
-    pyconvert(Bool, meth == pybuiltins.None) && return nothing
-
-    if hasproperty(meth, "is_Boolean")
-        if pyconvert(Bool, meth.is_Boolean == true)
-            return meth == _sympy_.logic.boolalg.BooleanFalse
-        end
-    end
-
-    # __class__ dispatch
-    if hasproperty(meth, :__class__)
-        cnm = string(meth.__class__.__name__)
-        if cnm == "bool"
-            return pyconvert(Bool, meth)
-        end
-        if cnm == "module"
-            # treat modules, callsm others differently
-            return Sym(meth)
-        end
-    end
+    pyis(meth, pybuiltins.None) && return nothing
 
     ## __call__
-    if hasproperty(meth, "__call__")
+    if pycallable(meth) # "__call__") #hasproperty(meth, "__call__")
         return SymPyCore.SymbolicCallable(meth)
     end
 
+    # __class__ dispatch
+    if pyisinstance(meth, _bool_)
+        return pyconvert(Bool, meth)
+    end
+
+    if pyisinstance(meth, _ModuleType_)
+        return Sym(meth)
+    end
+
+
+    # just convert
     return ↑(convert(PythonCall.Py, meth))
 
 end

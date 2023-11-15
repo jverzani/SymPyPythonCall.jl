@@ -3,6 +3,7 @@ uuid = "bc8888f7-b21e-4b7c-a06a-5d9c9496438c"
 authors = ["jverzani <jverzani@gmail.com> and contributors"]
 version = "0.2.3"
 
+
 [deps]
 CommonEq = "3709ef60-1bee-4518-9f2f-acd86f176c50"
 CommonSolve = "38540f10-b2f7-11e9-35d8-d573e4eb0ff2"
@@ -19,7 +20,7 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 SymPyPythonCallSymbolicsExt = "Symbolics"
 
 [compat]
-CommonEq = "0.2"
+CommonEq = "0.2.1"
 CommonSolve = "0.2"
 CondaPkg = "0.2"
 LinearAlgebra = "1.6.1"
@@ -27,7 +28,7 @@ PythonCall = "0.9"
 SpecialFunctions = "0.8, 0.9, 0.10, 1.0, 2"
 Symbolics = "5"
 SymbolicUtils = "1"
-SymPyCore = "=0.1.5, 1"
+SymPyCore = "0.1.6, 1"
 julia = "1.6.1"
 
 

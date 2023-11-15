@@ -15,6 +15,7 @@ _pyimport(a) = PythonCall.pyimport(a)
 _pyimport_conda(a,b) = PythonCall.pyimport(a)  # XXX lose things
 _pyobject(x) = PythonCall.pyconvert(Py, x)
 _pytype_mapping(typ,a)  = nothing
+const _pybuiltin = PythonCall.pybuiltins
 
 core_src_path = joinpath(pathof(SymPyCore), "../../src/SymPy")
 include(joinpath(core_src_path, "sympy.jl"))
