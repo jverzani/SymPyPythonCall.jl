@@ -1,7 +1,4 @@
 ## PythonCall specific usage
-Base.convert(::Type{Complex{S}}, x::Sym{T}) where {S<:Number, T<:PythonCall.Py} =
-    Complex(convert(S, real(x)), convert(S, imag(x)))
-
 Base.convert(::Type{S}, x::Sym{T}) where {T <: PythonCall.Py, S<:Sym} = x
 Base.convert(::Type{S}, x::T) where {T<:PythonCall.Py, S <: SymbolicObject} = Sym(x)
 
