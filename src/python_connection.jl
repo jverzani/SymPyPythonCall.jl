@@ -20,13 +20,13 @@ SymPyCore.:↓(x::Set) = _sympy_.sympify(pyset(↓(sᵢ) for sᵢ ∈ x))
 SymPyCore.:↑(::Type{<:AbstractString}, x) = Sym(Py(x))
 function SymPyCore.:↑(::Type{PythonCall.Py}, x)
     # this lower level approach shouldn't allocate
-    pyisinstance(x, pybuiltins.set) && return Set(Sym.(x)) #Set(↑(xᵢ) for xᵢ ∈ x)
+    pyisinstance(x, pybuiltins.set) && return Set(Sym.(collect(x))) #Set(↑(xᵢ) for xᵢ ∈ x)
     pyisinstance(x, pybuiltins.tuple) && return Tuple(↑(xᵢ) for xᵢ ∈ x)
     pyisinstance(x, pybuiltins.list) && return [↑(xᵢ) for xᵢ ∈ x]
     pyisinstance(x, pybuiltins.dict) && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
 
     # add more sympy containers in sympy.jl and here
-    pyisinstance(x, _FiniteSet_) && return Set(Sym.(x))
+    pyisinstance(x, _FiniteSet_) && return Set(Sym.(collect(x)))
     pyisinstance(x, _MutableDenseMatrix_) && return _up_matrix(x) #map(↑, x.tolist())
 
     # fallback
