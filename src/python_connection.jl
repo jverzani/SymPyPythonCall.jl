@@ -26,7 +26,7 @@ function SymPyCore.:↑(::Type{PythonCall.Py}, x)
     pyisinstance(x, pybuiltins.dict) && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
 
     # add more sympy containers in sympy.jl and here
-    pyisinstance(x, _FiniteSet_) && return Set(Sym.(x))
+    pyisinstance(x, _FiniteSet_) && return Set(Sym.(collect(x)))
     pyisinstance(x, _MutableDenseMatrix_) && return _up_matrix(x) #map(↑, x.tolist())
 
     # fallback
