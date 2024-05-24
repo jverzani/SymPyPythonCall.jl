@@ -1,14 +1,30 @@
 ## PythonCall specific usage
 Base.convert(::Type{S}, x::Sym{T}) where {T <: PythonCall.Py, S<:Sym} = x
+Base.convert(::Type{S}, x::Sym{T}) where {T <: PythonCall.Py,
+                                          S<:Sym{PythonCall.Py}} = x
 Base.convert(::Type{S}, x::T) where {T<:PythonCall.Py, S <: SymbolicObject} = Sym(x)
 
 SymPyCore._convert(::Type{T}, x) where {T} = pyconvert(T, x)
 function SymPyCore._convert(::Type{Bool}, x::Py)
-    pyconvert(Bool, x == _sympy_.logic.boolalg.BooleanTrue) && return true
-    pyconvert(Bool, x == _sympy_.logic.boolalg.BooleanFalse) && return false
+    pyisinstance(x, _sympy_.logic.boolalg.BooleanTrue) && return true
+    pyisinstance(x, _sympy_.logic.boolalg.BooleanFalse) && return false
     pyconvert(Bool, pybool(x))
 end
 
+function SymPyCore.Bool3(x::Sym{T}) where {T <: PythonCall.Py}
+    y = ↓(x)
+    isnothing(y) && return nothing
+    if hasproperty(y, "is_Boolean")
+        if pyconvert(Bool, y.is_Boolean)
+            return SymPyCore._convert(Bool, y)
+        end
+    elseif hasproperty(y, "__bool__")
+        if pyconvert(Bool, y.__bool__ != ↓(Sym(nothing)))
+            return pyconvert(Bool, y.__bool__())
+        end
+    end
+    return nothing
+end
 
 ## Modifications for ↓, ↑
 Sym(x::Nothing) = Sym(pybuiltins.None)

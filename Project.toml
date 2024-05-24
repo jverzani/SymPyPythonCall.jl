@@ -1,7 +1,7 @@
 name = "SymPyPythonCall"
 uuid = "bc8888f7-b21e-4b7c-a06a-5d9c9496438c"
 authors = ["jverzani <jverzani@gmail.com> and contributors"]
-version = "0.2.6"
+version = "0.3.0"
 
 
 [deps]
@@ -28,7 +28,7 @@ PythonCall = "0.9"
 SpecialFunctions = "0.8, 0.9, 0.10, 1.0, 2"
 Symbolics = "5"
 SymbolicUtils = "1"
-SymPyCore = "0.1.6, 1"
+SymPyCore = "0.2, 1"
 julia = "1.6.1"
 
 
