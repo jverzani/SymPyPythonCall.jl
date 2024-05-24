@@ -1,6 +1,7 @@
 ## PythonCall specific usage
 Base.convert(::Type{S}, x::Sym{T}) where {T <: PythonCall.Py, S<:Sym} = x
-Base.convert(::Type{S}, x::Sym{T}) where {T<:PythonCall.Py S<:Sym{PythonCall.Py}} = x
+Base.convert(::Type{S}, x::Sym{T}) where {T <: PythonCall.Py,
+                                          S<:Sym{PythonCall.Py}} = x
 Base.convert(::Type{S}, x::T) where {T<:PythonCall.Py, S <: SymbolicObject} = Sym(x)
 
 SymPyCore._convert(::Type{T}, x) where {T} = pyconvert(T, x)
@@ -9,9 +10,6 @@ function SymPyCore._convert(::Type{Bool}, x::Py)
     pyisinstance(x, _sympy_.logic.boolalg.BooleanFalse) && return false
     pyconvert(Bool, pybool(x))
 end
-
-
-SymPyCore.Bool3(::Sym{Nothing}) = nothing
 
 function SymPyCore.Bool3(x::Sym{T}) where {T <: PythonCall.Py}
     y = ↓(x)
