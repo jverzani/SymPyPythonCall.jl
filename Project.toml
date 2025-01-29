@@ -1,7 +1,7 @@
 name = "SymPyPythonCall"
 uuid = "bc8888f7-b21e-4b7c-a06a-5d9c9496438c"
 authors = ["jverzani <jverzani@gmail.com> and contributors"]
-version = "0.4.1"
+version = "0.4.2"
 
 
 [deps]
@@ -21,7 +21,7 @@ LinearAlgebra = "1.6.1"
 PythonCall = "0.9"
 SparseArrays = "1.1"
 SpecialFunctions = "0.8, 0.9, 0.10, 1.0, 2"
-SymPyCore = "0.2.5, 1"
+SymPyCore = "<0.2.10"
 TermInterface = "2"
 julia = "1.6.1"
 
