@@ -34,9 +34,12 @@ SymPyCore.:↓(d::Dict) = pydict((↓(k) => ↓(v) for (k,v) ∈ pairs(d)))
 SymPyCore.:↓(x::Set) = _sympy_.sympify(pyset(↓(sᵢ) for sᵢ ∈ x))
 
 SymPyCore.:↑(::Type{<:AbstractString}, x) = Sym(Py(x))
+
+_Set(x) = Set(x)
+_Set(xs...) = Set(xs)
 function SymPyCore.:↑(::Type{PythonCall.Py}, x)
     # this lower level approach shouldn't allocate
-    pyisinstance(x, pybuiltins.set) && return Set(Sym.(collect(x))) #Set(↑(xᵢ) for xᵢ ∈ x)
+    pyisinstance(x, pybuiltins.set) && return _Set(collect(map(↑, x)))
     pyisinstance(x, pybuiltins.tuple) && return Tuple(↑(xᵢ) for xᵢ ∈ x)
     pyisinstance(x, pybuiltins.list) && return [↑(xᵢ) for xᵢ ∈ x]
     pyisinstance(x, pybuiltins.dict) && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
