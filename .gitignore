@@ -10,3 +10,7 @@
 /default.profraw
 /test/default.profraw
 /docs/default.profraw
+# IDE files
+.idea/
+*.iml
+.vscode/
